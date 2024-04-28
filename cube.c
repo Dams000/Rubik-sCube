@@ -11,6 +11,50 @@ Cube Cube_make() {
   return cube;
 }
 
+Rotation getCorrespondingRotation(char c) {
+  switch (c) {
+  case 'U':
+    return U;
+  case 'u':
+    return u;
+  case 'D':
+    return D;
+  case 'd':
+    return d;
+  case 'R':
+    return R;
+  case 'r':
+    return r;
+  case 'L':
+    return L;
+  case 'l':
+    return l;
+  case 'F':
+    return F;
+  case 'f':
+    return f;
+  case 'B':
+    return B;
+  case 'b':
+    return b;
+  case 'M':
+    return M;
+  case 'm':
+    return m;
+  case 'E':
+    return E;
+  case 'e':
+    return e;
+  case 'S':
+    return S;
+  case 's':
+    return s;
+  default:
+    return -1;
+  }
+}
+
+
 /*----------------------------------------------------------------*/
 
 void swap(Cube *cube, int i1, int i2, int i3, int i4) {
