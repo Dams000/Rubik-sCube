@@ -111,7 +111,7 @@ int main(void) {
     BeginMode3D(camera);
     ClearBackground(LIGHTGRAY);
 
-    DrawCube((Vector3){0}, 2.9, 2.9, 2.9, BLACK);
+    DrawCube((Vector3){0}, SIZE - 0.1f, SIZE - 0.1f, SIZE - 0.1f, BLACK);
     for (int z = 0; z < SIZE; z++)
       for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE; x++)
