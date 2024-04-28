@@ -6,9 +6,12 @@ Cube Cube_make() {
   for (int x = 0; x < SIZE; x++)
     for (int y = 0; y < SIZE; y++)
       for (int z = 0; z < SIZE; z++)
-        cube.cube[x][y][z] = Cubie_make(x - 1, y - 1, z - 1);
+        cube.cube[x][y][z] =
+            Cubie_make(x - SIZE / 2, y - SIZE / 2, z - SIZE / 2);
   return cube;
 }
+
+/*----------------------------------------------------------------*/
 
 void swap(Cube *cube, int i1, int i2, int i3, int i4) {
   Cubie tmp = cube->cube[i1 % 3][i1 / 3 % 3][i1 / 9];

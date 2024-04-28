@@ -1,17 +1,18 @@
 #include "cublet.h"
+#include "cube.h"
 #include "include/raylib.h"
 #include "include/rlgl.h"
 
 enum faces { UP, FRONT, RIGHT, BACK, LEFT, DOWN } face;
 
-Cubie Cubie_make(float x, float y, float z) {
+Cubie Cubie_make(int x, int y, int z) {
   return (Cubie){.position = (Vector3){.x = x, .y = y, .z = z},
-                 .colors = {(y == 1) ? WHITE : BLACK, 
-                            (z == 1) ? GREEN : BLACK,
-                            (x == 1) ? RED : BLACK, 
-                            (z == -1) ? BLUE : BLACK,
-                            (x == -1) ? ORANGE : BLACK,
-                            (y == -1) ? YELLOW : BLACK},
+                 .colors = {(y == SIZE / 2) ? WHITE : BLACK,
+                            (z == SIZE / 2) ? GREEN : BLACK,
+                            (x == SIZE / 2) ? RED : BLACK,
+                            (z == -SIZE / 2) ? BLUE : BLACK,
+                            (x == -SIZE / 2) ? ORANGE : BLACK,
+                            (y == -SIZE / 2) ? YELLOW : BLACK},
                  .sideLength = 0.95};
 }
 

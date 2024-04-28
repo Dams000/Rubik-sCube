@@ -10,7 +10,7 @@ typedef struct Cubie {
   float sideLength;
 } Cubie;
 
-Cubie Cubie_make(float x, float y, float z);
+Cubie Cubie_make(int x, int y, int z);
 
 void Cubie_setCoordinates(Cubie *cubie, float x, float y, float z);
 

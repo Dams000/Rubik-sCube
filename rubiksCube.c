@@ -68,17 +68,17 @@ void handleMouseMovementAndUpdateCamera() {
   float dt = GetFrameTime();
 
   camera_mag += camera_mag_vel * dt;
-  if (camera_mag < 3.0f)
-    camera_mag = 3.0f;
-  if (camera_mag > 10.0f)
-    camera_mag = 10.0f;
+  if (camera_mag < SIZE)
+    camera_mag = SIZE;
+  if (camera_mag > 3 * SIZE)
+    camera_mag = 3 * SIZE;
   camera_mag_vel -= GetMouseWheelMove() * 20;
   camera_mag_vel *= 0.9;
 
   if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
     Vector2 delta = GetMouseDelta();
-    camera_theta -= delta.x * 0.01;
-    camera_phi -= delta.y * 0.01;
+    camera_theta -= delta.x * 0.005;
+    camera_phi -= delta.y * 0.005;
   }
   if (camera_phi >= PI)
     camera_phi = PI - 0.01;
@@ -115,7 +115,7 @@ int main(void) {
     for (int z = 0; z < SIZE; z++)
       for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE; x++)
-          Cubie_drawCubie(&cube.cube[x][y][z], (Vector3){x - 1, y - 1, z - 1});
+          Cubie_drawCubie(&cube.cube[x][y][z], (Vector3){x - (int)(SIZE / 2), y - (int)(SIZE / 2), z - (int)(SIZE / 2)});
 
     // Cubie_drawCubie(&cube.cube[6 % 3][6 / 3 % 3][6 / 9],
     //                 (Vector3){6 % 3 - 1, 6 / 3 % 3 - 1, 6 / 9 - 1});
