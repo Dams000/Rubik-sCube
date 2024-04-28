@@ -7,12 +7,12 @@ enum faces { UP, FRONT, RIGHT, BACK, LEFT, DOWN } face;
 
 Cubie Cubie_make(int x, int y, int z) {
   return (Cubie){.position = (Vector3){.x = x, .y = y, .z = z},
-                 .colors = {(y == SIZE / 2) ? WHITE : BLACK,
-                            (z == SIZE / 2) ? GREEN : BLACK,
-                            (x == SIZE / 2) ? RED : BLACK,
-                            (z == -SIZE / 2) ? BLUE : BLACK,
-                            (x == -SIZE / 2) ? ORANGE : BLACK,
-                            (y == -SIZE / 2) ? YELLOW : BLACK},
+                 .colors = {(SIZE == 1 || y == SIZE / 2) ? WHITE : BLACK,
+                            (SIZE == 1 || z == SIZE / 2) ? GREEN : BLACK,
+                            (SIZE == 1 || x == SIZE / 2) ? RED : BLACK,
+                            (SIZE == 1 || z == -SIZE / 2) ? BLUE : BLACK,
+                            (SIZE == 1 || x == -SIZE / 2) ? ORANGE : BLACK,
+                            (SIZE == 1 || y == -SIZE / 2) ? YELLOW : BLACK},
                  .sideLength = 0.95};
 }
 
