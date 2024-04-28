@@ -1,5 +1,32 @@
 # RubiksCube
 
+Sources:
+- https://en.wikipedia.org/wiki/Spherical_coordinate_system
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Getting started
