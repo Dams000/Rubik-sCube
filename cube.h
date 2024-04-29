@@ -41,7 +41,7 @@ typedef struct Cube {
   Cubie cube[SIZE][SIZE][SIZE];
 } Cube;
 
-Cube Cube_make();
+Cube Cube_make(float cubletSize);
 
 Rotation getCorrespondingRotation(char c);
 

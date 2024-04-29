@@ -5,7 +5,7 @@
 
 enum faces { UP, FRONT, RIGHT, BACK, LEFT, DOWN } face;
 
-Cubie Cubie_make(int x, int y, int z) {
+Cubie Cubie_make(int x, int y, int z, float sideLength) {
   return (Cubie){.position = (Vector3){.x = x, .y = y, .z = z},
                  .colors = {(SIZE == 1 || y == SIZE / 2) ? WHITE : BLACK,
                             (SIZE == 1 || z == SIZE / 2) ? GREEN : BLACK,
@@ -13,7 +13,7 @@ Cubie Cubie_make(int x, int y, int z) {
                             (SIZE == 1 || z == -SIZE / 2) ? BLUE : BLACK,
                             (SIZE == 1 || x == -SIZE / 2) ? ORANGE : BLACK,
                             (SIZE == 1 || y == -SIZE / 2) ? YELLOW : BLACK},
-                 .sideLength = 0.95};
+                 .sideLength = sideLength};
 }
 
 void Cubie_setCoordinates(Cubie *cubie, float x, float y, float z) {

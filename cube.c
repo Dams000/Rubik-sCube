@@ -1,13 +1,17 @@
 #include "cube.h"
 #include "cublet.h"
 
-Cube Cube_make() {
+Cube Cube_make(float cubletSize) {
   Cube cube;
   for (int x = 0; x < SIZE; x++)
     for (int y = 0; y < SIZE; y++)
-      for (int z = 0; z < SIZE; z++)
+      for (int z = 0; z < SIZE; z++) {
+        if (x != 0 && y != 0 && z != 0 && x != SIZE - 1 && y != SIZE - 1 &&
+            z != SIZE - 1)
+          continue;
         cube.cube[x][y][z] =
-            Cubie_make(x - SIZE / 2, y - SIZE / 2, z - SIZE / 2);
+            Cubie_make(x - SIZE / 2, y - SIZE / 2, z - SIZE / 2, cubletSize);
+      }
   return cube;
 }
 
@@ -54,7 +58,6 @@ Rotation getCorrespondingRotation(char c) {
   }
 }
 
-
 /*----------------------------------------------------------------*/
 
 void swap(Cube *cube, int i1, int i2, int i3, int i4) {
@@ -69,6 +72,35 @@ void swap(Cube *cube, int i1, int i2, int i3, int i4) {
       cube->cube[i4 % 3][i4 / 3 % 3][i4 / 9];
 
   cube->cube[i4 % 3][i4 / 3 % 3][i4 / 9] = tmp;
+}
+
+void rotate(Cube *cube) {
+
+  Cubie right_face[SIZE][SIZE];
+
+  for (int i = 0; i < SIZE; i++) {
+    for (int j = 0; j < SIZE; j++) {
+      right_face[i][j] = cube->cube[SIZE - 1][i][j];
+    }
+  }
+
+  // Transpose the matrix
+  for (int i = 0; i < 3; i++) {
+    for (int j = i + 1; j < 3; j++) {
+      Cubie temp = right_face[i][j];
+      right_face[i][j] = right_face[j][i];
+      right_face[j][i] = temp;
+    }
+  }
+
+  // Reverse each row
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3 / 2; j++) {
+      Cubie temp = right_face[i][j];
+      right_face[i][j] = right_face[i][3 - j - 1];
+      right_face[i][3 - j - 1] = temp;
+    }
+  }
 }
 
 void Cube_rotate(Cube *cube, Rotation rotation) {

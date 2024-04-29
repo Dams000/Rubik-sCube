@@ -96,11 +96,11 @@ int main(int argc, char **argv) {
   InitWindow(1200, 800, "Rubik's Cube");
   SetTargetFPS(40);
 
-  Cube cube = Cube_make();
+  Cube cube = Cube_make(CUBE_SIZE);
 
   if (argc == 2) {
     char *moves = argv[1];
-    for (int i = 0; i < strlen(moves); i++) {
+    for (size_t i = 0; i < strlen(moves); i++) {
       char curr = (moves[i] == '2') ? moves[i - 1] : moves[i];
       if (moves[i + 1] == '\'') {
         curr = tolower(curr);
@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
     BeginMode3D(camera);
     ClearBackground(LIGHTGRAY);
 
-    DrawCube((Vector3){0}, SIZE - 0.1f, SIZE - 0.1f, SIZE - 0.1f, BLACK);
+    // DrawCube((Vector3){0}, SIZE - 0.1f, SIZE - 0.1f, SIZE - 0.1f, BLACK);
     for (int z = 0; z < SIZE; z++)
       for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE; x++)
