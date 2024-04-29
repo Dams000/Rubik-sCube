@@ -4,7 +4,7 @@
 #include <math.h>
 #include <string.h>
 
-#define CUBE_SIZE 0.95
+#define CUBIE_SIZE 0.6
 
 float camera_mag = 5;
 float camera_mag_vel = 0.0f;
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
   InitWindow(1200, 800, "Rubik's Cube");
   SetTargetFPS(40);
 
-  Cube cube = Cube_make(CUBE_SIZE);
+  Cube cube = Cube_make(CUBIE_SIZE);
 
   if (argc == 2) {
     char *moves = argv[1];

@@ -74,85 +74,99 @@ void swap(Cube *cube, int i1, int i2, int i3, int i4) {
   cube->cube[i4 % 3][i4 / 3 % 3][i4 / 9] = tmp;
 }
 
-void rotate(Cube *cube) {
-
-  Cubie right_face[SIZE][SIZE];
-
-  for (int i = 0; i < SIZE; i++) {
-    for (int j = 0; j < SIZE; j++) {
-      right_face[i][j] = cube->cube[SIZE - 1][i][j];
+// TODO: why is clockwise rotation equals to anti-clockwise on the cube ?
+void rotateAntiClockwise(Cubie up_face[SIZE][SIZE]) {
+  //  Transpose the matrix
+  for (int i = 0; i < SIZE; i++)
+    for (int j = i + 1; j < SIZE; j++) {
+      Cubie temp = up_face[i][j];
+      up_face[i][j] = up_face[j][i];
+      up_face[j][i] = temp;
     }
-  }
-
-  // Transpose the matrix
-  for (int i = 0; i < 3; i++) {
-    for (int j = i + 1; j < 3; j++) {
-      Cubie temp = right_face[i][j];
-      right_face[i][j] = right_face[j][i];
-      right_face[j][i] = temp;
-    }
-  }
 
   // Reverse each row
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3 / 2; j++) {
-      Cubie temp = right_face[i][j];
-      right_face[i][j] = right_face[i][3 - j - 1];
-      right_face[i][3 - j - 1] = temp;
+  for (int i = 0; i < SIZE; i++)
+    for (int j = 0; j < SIZE / 2; j++) {
+      Cubie temp = up_face[i][j];
+      up_face[i][j] = up_face[i][SIZE - j - 1];
+      up_face[i][SIZE - j - 1] = temp;
     }
-  }
+}
+
+void rotateClockwise(Cubie up_face[SIZE][SIZE]) {
+  //  Transpose the matrix
+  for (int i = 0; i < SIZE; i++)
+    for (int j = i + 1; j < SIZE; j++) {
+      Cubie temp = up_face[i][j];
+      up_face[i][j] = up_face[j][i];
+      up_face[j][i] = temp;
+    }
+
+  // Reverse each row
+  for (int j = 0; j < SIZE; j++)
+    for (int i = 0; i < SIZE / 2; i++) {
+      Cubie temp = up_face[i][j];
+      up_face[i][j] = up_face[SIZE - i - 1][j];
+      up_face[SIZE - i - 1][j] = temp;
+    }
 }
 
 void Cube_rotate(Cube *cube, Rotation rotation) {
   switch (rotation) {
   case U: {
-    int indices[] = {7, 8, 9, 16, 17, 18, 25, 26, 27};
-    for (int i = 0; i < 9; i++) {
-      int index = indices[i];
-      Cubie_rotateLeft(
-          &cube->cube[(index - 1) % 3][(index - 1) / 3 % 3][(index - 1) / 9]);
-    }
-    swap(cube, BACK_TOP_LEFT, FRONT_TOP_LEFT, FRONT_TOP_RIGHT, BACK_TOP_RIGHT);
-    swap(cube, BACK_TOP_MIDDLE, MIDDLE_TOP_LEFT, FRONT_TOP_MIDDLE,
-         MIDDLE_TOP_RIGHT);
+    Cubie up_face[SIZE][SIZE];
+
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++) {
+        Cubie_rotateLeft(&cube->cube[i][SIZE - 1][j]);
+        up_face[i][j] = cube->cube[i][SIZE - 1][j];
+      }
+    rotateClockwise(up_face);
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++)
+        cube->cube[i][SIZE - 1][j] = up_face[i][j];
     break;
   }
   case u: {
-    int indices[] = {7, 8, 9, 16, 17, 18, 25, 26, 27};
-    for (int i = 0; i < 9; i++) {
-      int index = indices[i];
-      Cubie_rotateRight(
-          &cube->cube[(index - 1) % 3][(index - 1) / 3 % 3][(index - 1) / 9]);
-    }
-    swap(cube, FRONT_TOP_LEFT, BACK_TOP_LEFT, BACK_TOP_RIGHT, FRONT_TOP_RIGHT);
-    swap(cube, FRONT_TOP_MIDDLE, MIDDLE_TOP_LEFT, BACK_TOP_MIDDLE,
-         MIDDLE_TOP_RIGHT);
+    Cubie up_face[SIZE][SIZE];
+
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++) {
+        Cubie_rotateRight(&cube->cube[i][SIZE - 1][j]);
+        up_face[i][j] = cube->cube[i][SIZE - 1][j];
+      }
+    rotateAntiClockwise(up_face);
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++)
+        cube->cube[i][SIZE - 1][j] = up_face[i][j];
     break;
   }
   case D: {
-    int indices[] = {1, 2, 3, 10, 11, 12, 19, 20, 21};
-    for (int i = 0; i < 9; i++) {
-      int index = indices[i];
-      Cubie_rotateRight(
-          &cube->cube[(index - 1) % 3][(index - 1) / 3 % 3][(index - 1) / 9]);
-    }
-    swap(cube, FRONT_BOTTOM_LEFT, BACK_BOTTOM_LEFT, BACK_BOTTOM_RIGHT,
-         FRONT_BOTTOM_RIGHT);
-    swap(cube, FRONT_BOTTOM_MIDDLE, MIDDLE_BOTTOM_LEFT, BACK_BOTTOM_MIDDLE,
-         MIDDLE_BOTTOM_RIGHT);
+    Cubie down_face[SIZE][SIZE];
+
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++) {
+        Cubie_rotateRight(&cube->cube[i][0][j]);
+        down_face[i][j] = cube->cube[i][0][j];
+      }
+    rotateAntiClockwise(down_face);
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++)
+        cube->cube[i][0][j] = down_face[i][j];
     break;
   }
   case d: {
-    int indices[] = {1, 2, 3, 10, 11, 12, 19, 20, 21};
-    for (int i = 0; i < 9; i++) {
-      int index = indices[i];
-      Cubie_rotateLeft(
-          &cube->cube[(index - 1) % 3][(index - 1) / 3 % 3][(index - 1) / 9]);
-    }
-    swap(cube, BACK_BOTTOM_LEFT, FRONT_BOTTOM_LEFT, FRONT_BOTTOM_RIGHT,
-         BACK_BOTTOM_RIGHT);
-    swap(cube, BACK_BOTTOM_MIDDLE, MIDDLE_BOTTOM_LEFT, FRONT_BOTTOM_MIDDLE,
-         MIDDLE_BOTTOM_RIGHT);
+    Cubie down_face[SIZE][SIZE];
+
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++) {
+        Cubie_rotateLeft(&cube->cube[i][0][j]);
+        down_face[i][j] = cube->cube[i][0][j];
+      }
+    rotateClockwise(down_face);
+    for (int i = 0; i < SIZE; i++)
+      for (int j = 0; j < SIZE; j++)
+        cube->cube[i][0][j] = down_face[i][j];
     break;
   }
   case R: {
