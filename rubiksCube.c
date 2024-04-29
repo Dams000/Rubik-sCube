@@ -4,7 +4,7 @@
 #include <math.h>
 #include <string.h>
 
-#define CUBIE_SIZE 0.6
+#define CUBIE_SIZE 0.9
 
 float camera_mag = 5;
 float camera_mag_vel = 0.0f;
@@ -125,7 +125,9 @@ int main(int argc, char **argv) {
     BeginMode3D(camera);
     ClearBackground(LIGHTGRAY);
 
-    // DrawCube((Vector3){0}, SIZE - 0.1f, SIZE - 0.1f, SIZE - 0.1f, BLACK);
+    DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
+             SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
+             BLACK);
     for (int z = 0; z < SIZE; z++)
       for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE; x++)
