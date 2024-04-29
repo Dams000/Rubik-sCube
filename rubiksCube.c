@@ -1,5 +1,6 @@
 #include "cube.h"
 #include "include/raylib.h"
+#include <ctype.h>
 #include <math.h>
 #include <string.h>
 
@@ -97,9 +98,16 @@ int main(int argc, char **argv) {
 
   Cube cube = Cube_make();
 
-  for (int i = 0; i < strlen(argv[1]); i++) {
-    char curr = (argv[1][i] == '2') ? argv[1][i - 1] : argv[1][i];
-    Cube_rotate(&cube, getCorrespondingRotation(curr));
+  if (argc == 2) {
+    char *moves = argv[1];
+    for (int i = 0; i < strlen(moves); i++) {
+      char curr = (moves[i] == '2') ? moves[i - 1] : moves[i];
+      if (moves[i + 1] == '\'') {
+        curr = tolower(curr);
+        i++;
+      }
+      Cube_rotate(&cube, getCorrespondingRotation(curr));
+    }
   }
 
   // int x = 0;
@@ -110,7 +118,7 @@ int main(int argc, char **argv) {
     handleKeyPress(&cube);
 
     // if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
-    //   x = (x == 26) ? 0 : x + 1;
+    //   x = (x == SIZE * SIZE * SIZE - 1) ? 0 : x + 1;
 
     BeginDrawing();
 
