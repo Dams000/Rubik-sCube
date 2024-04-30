@@ -15,6 +15,8 @@ float camera_phi = PI / 4;
 
 Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
+Cube cube;
+
 void handleKeyPress(Cube *cube) {
   if (IsKeyPressed(KEY_U)) {
     if (IsKeyDown(KEY_LEFT_ALT))
@@ -80,6 +82,8 @@ void handleKeyPress(Cube *cube) {
 }
 
 void handleMouseMovementAndUpdateCamera() {
+if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) cube = Cube_make(CUBIE_SIZE);
+
   float dt = GetFrameTime();
 
   camera_mag += camera_mag_vel * dt;
@@ -111,7 +115,7 @@ int main(int argc, char **argv) {
   SetWindowMinSize(600, 400);
   SetTargetFPS(40);
 
-  Cube cube = Cube_make(CUBIE_SIZE);
+  cube = Cube_make(CUBIE_SIZE);
 
   if (argc == 2) {
     char *moves = argv[1];
