@@ -131,9 +131,9 @@ int main(int argc, char **argv) {
     BeginMode3D(camera);
     ClearBackground(LIGHTGRAY);
 
-    DrawLine3D(Vector3Zero(), (Vector3){(int)(SIZE / 2) + 2, 0, 0}, GRAY);
-    DrawLine3D(Vector3Zero(), (Vector3){0, (int)(SIZE / 2) + 2, 0}, GRAY);
-    DrawLine3D(Vector3Zero(), (Vector3){0, 0, (int)(SIZE / 2) + 2}, GRAY);
+    DrawLine3D(Vector3Zero(), (Vector3){(float)SIZE / 2 + 2, 0, 0}, GRAY);
+    DrawLine3D(Vector3Zero(), (Vector3){0, (float)SIZE / 2 + 2, 0}, GRAY);
+    DrawLine3D(Vector3Zero(), (Vector3){0, 0, (float)SIZE / 2 + 2}, GRAY);
     // DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
     //          SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
     //          BLACK);
@@ -141,8 +141,9 @@ int main(int argc, char **argv) {
       for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE; x++)
           Cubie_drawCubie(&cube.cube[x][y][z],
-                          (Vector3){x - (int)(SIZE / 2), y - (int)(SIZE / 2),
-                                    z - (int)(SIZE / 2)});
+                          (Vector3){x - (float)SIZE / 2 + 0.5f,
+                                    y - (float)SIZE / 2 + 0.5f,
+                                    z - (float)SIZE / 2 + 0.5f});
 
     EndMode3D();
     EndDrawing();

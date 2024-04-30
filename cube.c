@@ -4,16 +4,20 @@
 #include <ctype.h>
 #include <string.h>
 
+bool isInnerCubie(float x, float y, float z) {
+  return x != 0 && y != 0 && z != 0 && x != SIZE - 1 && y != SIZE - 1 &&
+         z != SIZE - 1;
+}
+
 Cube Cube_make(float cubletSize) {
   Cube cube;
   for (int x = 0; x < SIZE; x++)
     for (int y = 0; y < SIZE; y++)
       for (int z = 0; z < SIZE; z++) {
-        if (x != 0 && y != 0 && z != 0 && x != SIZE - 1 && y != SIZE - 1 &&
-            z != SIZE - 1)
+        if (isInnerCubie(x, y, z))
           continue;
         cube.cube[x][y][z] =
-            Cubie_make(x - SIZE / 2, y - SIZE / 2, z - SIZE / 2, cubletSize);
+            Cubie_make(x, y, z, cubletSize);
       }
   return cube;
 }
