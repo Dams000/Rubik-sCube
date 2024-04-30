@@ -1,12 +1,14 @@
 #include "cube.h"
 #include "include/raylib.h"
+#include "include/raymath.h"
 #include <ctype.h>
 #include <math.h>
+#include <stdarg.h>
 #include <string.h>
 
 #define CUBIE_SIZE 0.9
 
-float camera_mag = 5;
+float camera_mag = 20;
 float camera_mag_vel = 0.0f;
 float camera_theta = PI / 4;
 float camera_phi = PI / 4;
@@ -14,10 +16,6 @@ float camera_phi = PI / 4;
 Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 void handleKeyPress(Cube *cube) {
-  // int x = GetKeyPressed();
-  // if (x != 0)
-  //   printf("%d\n", x);
-
   if (IsKeyPressed(KEY_U)) {
     if (IsKeyDown(KEY_LEFT_ALT))
       Cube_rotate(cube, u);
@@ -63,6 +61,21 @@ void handleKeyPress(Cube *cube) {
       Cube_rotate(cube, s);
     else
       Cube_rotate(cube, S);
+  } else if (IsKeyPressed(KEY_X)) {
+    if (IsKeyDown(KEY_LEFT_ALT))
+      Cube_rotate(cube, x);
+    else
+      Cube_rotate(cube, X);
+  } else if (IsKeyPressed(KEY_Y)) {
+    if (IsKeyDown(KEY_LEFT_ALT))
+      Cube_rotate(cube, y);
+    else
+      Cube_rotate(cube, Y);
+  } else if (IsKeyPressed(KEY_Z)) {
+    if (IsKeyDown(KEY_LEFT_ALT))
+      Cube_rotate(cube, z);
+    else
+      Cube_rotate(cube, Z);
   }
 }
 
@@ -93,7 +106,9 @@ void handleMouseMovementAndUpdateCamera() {
 }
 
 int main(int argc, char **argv) {
+  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(1200, 800, "Rubik's Cube");
+  SetWindowMinSize(600, 400);
   SetTargetFPS(40);
 
   Cube cube = Cube_make(CUBIE_SIZE);
@@ -110,21 +125,19 @@ int main(int argc, char **argv) {
     }
   }
 
-  // int x = 0;
-
   while (!WindowShouldClose()) {
     handleMouseMovementAndUpdateCamera();
 
     handleKeyPress(&cube);
-
-    // if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
-    //   x = (x == SIZE * SIZE * SIZE - 1) ? 0 : x + 1;
 
     BeginDrawing();
 
     BeginMode3D(camera);
     ClearBackground(LIGHTGRAY);
 
+    DrawLine3D(Vector3Zero(), (Vector3){(int)(SIZE / 2) + 2, 0, 0}, GRAY);
+    DrawLine3D(Vector3Zero(), (Vector3){0, (int)(SIZE / 2) + 2, 0}, GRAY);
+    DrawLine3D(Vector3Zero(), (Vector3){0, 0, (int)(SIZE / 2) + 2}, GRAY);
     DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
              SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
              BLACK);
@@ -134,15 +147,6 @@ int main(int argc, char **argv) {
           Cubie_drawCubie(&cube.cube[x][y][z],
                           (Vector3){x - (int)(SIZE / 2), y - (int)(SIZE / 2),
                                     z - (int)(SIZE / 2)});
-
-    // Cubie_drawCubie(&cube.cube[6 % 3][6 / 3 % 3][6 / 9],
-    //                 (Vector3){6 % 3 - 1, 6 / 3 % 3 - 1, 6 / 9 - 1});
-    // Cubie_drawCubie(&cube.cube[8 % 3][8 / 3 % 3][8 / 9],
-    //                 (Vector3){8 % 3 - 1, 8 / 3 % 3 - 1, 8 / 9 - 1});
-    // Cubie_drawCubie(&cube.cube[24 % 3][24 / 3 % 3][24 / 9],
-    //                 (Vector3){24 % 3 - 1, 24 / 3 % 3 - 1, 24 / 9 - 1});
-    // Cubie_drawCubie(&cube.cube[26 % 3][26 / 3 % 3][26 / 9],
-    //                 (Vector3){26 % 3 - 1, 26 / 3 % 3 - 1, 26 / 9 - 1});
 
     EndMode3D();
     EndDrawing();

@@ -247,5 +247,41 @@ void Cube_rotate(Cube *cube, Rotation rotation) {
                     Cubie_rotateAntiClockWise);
     break;
   }
+  case X: {
+    Cube_rotate(cube, R);
+    Cube_rotate(cube, m);
+    Cube_rotate(cube, l);
+    break;
+  }
+  case x: {
+    Cube_rotate(cube, r);
+    Cube_rotate(cube, M);
+    Cube_rotate(cube, L);
+    break;
+  }
+  case Y: {
+    Cube_rotate(cube, U);
+    Cube_rotate(cube, e);
+    Cube_rotate(cube, d);
+    break;
+  }
+  case y: {
+    Cube_rotate(cube, u);
+    Cube_rotate(cube, E);
+    Cube_rotate(cube, D);
+    break;
+  }
+  case Z: {
+    Cube_rotate(cube, F);
+    Cube_rotate(cube, S);
+    Cube_rotate(cube, b);
+    break;
+  }
+  case z: {
+    Cube_rotate(cube, f);
+    Cube_rotate(cube, s);
+    Cube_rotate(cube, B);
+    break;
+  }
   }
 }
