@@ -15,67 +15,67 @@ Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
 
-void handleKeyPress(Cube *cube) {
+void handleKeyPress() {
   if (IsKeyPressed(KEY_U)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, u);
+      Cube_rotate(&cube, u);
     else
-      Cube_rotate(cube, U);
+      Cube_rotate(&cube, U);
   } else if (IsKeyPressed(KEY_D)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, d);
+      Cube_rotate(&cube, d);
     else
-      Cube_rotate(cube, D);
+      Cube_rotate(&cube, D);
   } else if (IsKeyPressed(KEY_L)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, l);
+      Cube_rotate(&cube, l);
     else
-      Cube_rotate(cube, L);
+      Cube_rotate(&cube, L);
   } else if (IsKeyPressed(KEY_R)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, r);
+      Cube_rotate(&cube, r);
     else
-      Cube_rotate(cube, R);
+      Cube_rotate(&cube, R);
   } else if (IsKeyPressed(KEY_F)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, f);
+      Cube_rotate(&cube, f);
     else
-      Cube_rotate(cube, F);
+      Cube_rotate(&cube, F);
   } else if (IsKeyPressed(KEY_B)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, b);
+      Cube_rotate(&cube, b);
     else
-      Cube_rotate(cube, B);
+      Cube_rotate(&cube, B);
   } else if (IsKeyPressed(KEY_M)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, m);
+      Cube_rotate(&cube, m);
     else
-      Cube_rotate(cube, M);
+      Cube_rotate(&cube, M);
   } else if (IsKeyPressed(KEY_E)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, e);
+      Cube_rotate(&cube, e);
     else
-      Cube_rotate(cube, E);
+      Cube_rotate(&cube, E);
   } else if (IsKeyPressed(KEY_S)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, s);
+      Cube_rotate(&cube, s);
     else
-      Cube_rotate(cube, S);
+      Cube_rotate(&cube, S);
   } else if (IsKeyPressed(KEY_X)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, x);
+      Cube_rotate(&cube, x);
     else
-      Cube_rotate(cube, X);
+      Cube_rotate(&cube, X);
   } else if (IsKeyPressed(KEY_Y)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, y);
+      Cube_rotate(&cube, y);
     else
-      Cube_rotate(cube, Y);
+      Cube_rotate(&cube, Y);
   } else if (IsKeyPressed(KEY_Z)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(cube, z);
+      Cube_rotate(&cube, z);
     else
-      Cube_rotate(cube, Z);
+      Cube_rotate(&cube, Z);
   }
 }
 
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
   while (!WindowShouldClose()) {
     handleMouseMovementAndUpdateCamera();
 
-    handleKeyPress(&cube);
+    handleKeyPress();
 
     BeginDrawing();
 
@@ -134,9 +134,9 @@ int main(int argc, char **argv) {
     DrawLine3D(Vector3Zero(), (Vector3){(int)(SIZE / 2) + 2, 0, 0}, GRAY);
     DrawLine3D(Vector3Zero(), (Vector3){0, (int)(SIZE / 2) + 2, 0}, GRAY);
     DrawLine3D(Vector3Zero(), (Vector3){0, 0, (int)(SIZE / 2) + 2}, GRAY);
-    DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
-             SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
-             BLACK);
+    // DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
+    //          SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
+    //          BLACK);
     for (int z = 0; z < SIZE; z++)
       for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE; x++)

@@ -72,79 +72,43 @@ void Cube_applyMoves(Cube *cube, char *moves) {
   }
 }
 
-/*----------------------------------------------------------------*/
-
-void swap(Cube *cube, int i1, int i2, int i3, int i4) {
-  Cubie tmp = cube->cube[i1 % 3][i1 / 3 % 3][i1 / 9];
-  cube->cube[i1 % 3][i1 / 3 % 3][i1 / 9] =
-      cube->cube[i2 % 3][i2 / 3 % 3][i2 / 9];
-
-  cube->cube[i2 % 3][i2 / 3 % 3][i2 / 9] =
-      cube->cube[i3 % 3][i3 / 3 % 3][i3 / 9];
-
-  cube->cube[i3 % 3][i3 / 3 % 3][i3 / 9] =
-      cube->cube[i4 % 3][i4 / 3 % 3][i4 / 9];
-
-  cube->cube[i4 % 3][i4 / 3 % 3][i4 / 9] = tmp;
-}
-
-// TODO: why is clockwise rotation equals to anti-clockwise on the cube ?
-// depends on the side !
-void rotateAntiClockwise(Cube *cube, Vector3 dir,
-                         void (*cubieRotation)(Cubie *)) {
-  Cubie face[SIZE][SIZE];
-  int x, y, z;
-
-  for (int i = 0; i < SIZE; i++)
-    for (int j = 0; j < SIZE; j++) {
-      // x = (dir.x == 0) ? i : (dir.x == -1) ? 0 : SIZE - 1;
-      // y = (dir.y == 0) ? (dir.x == 0) ? j : i : (dir.y == -1) ? 0 : SIZE - 1;
-      // z = (dir.z == -1) ? 0 : (dir.z == 1) ? SIZE - 1 : j;
-      x = (dir.x == -1) ? i : dir.x;
-      y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
-      z = (dir.z == -1) ? j : dir.z;
-      cubieRotation(&cube->cube[x][y][z]);
-      face[i][j] = cube->cube[x][y][z];
-    }
-
-  //  Transpose the matrix
+void transposeMatrix(Cubie face[SIZE][SIZE]) {
   for (int i = 0; i < SIZE; i++)
     for (int j = i + 1; j < SIZE; j++) {
       Cubie temp = face[i][j];
       face[i][j] = face[j][i];
       face[j][i] = temp;
     }
+}
 
-  // Reverse each row
+void reverseRows(Cubie face[SIZE][SIZE]) {
   for (int i = 0; i < SIZE; i++)
     for (int j = 0; j < SIZE / 2; j++) {
       Cubie temp = face[i][j];
       face[i][j] = face[i][SIZE - j - 1];
       face[i][SIZE - j - 1] = temp;
     }
+}
 
-  for (int i = 0; i < SIZE; i++)
-    for (int j = 0; j < SIZE; j++) {
-      // x = (dir.x == 0) ? i : (dir.x == -1) ? 0 : SIZE - 1;
-      // y = (dir.y == 0) ? (dir.x == 0) ? j : i : (dir.y == -1) ? 0 : SIZE - 1;
-      // z = (dir.z == -1) ? 0 : (dir.z == 1) ? SIZE - 1 : j;
-      x = (dir.x == -1) ? i : dir.x;
-      y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
-      z = (dir.z == -1) ? j : dir.z;
-      cube->cube[x][y][z] = face[i][j];
+void reverseColumns(Cubie face[SIZE][SIZE]) {
+  for (int j = 0; j < SIZE; j++)
+    for (int i = 0; i < SIZE / 2; i++) {
+      Cubie temp = face[i][j];
+      face[i][j] = face[SIZE - i - 1][j];
+      face[SIZE - i - 1][j] = temp;
     }
 }
 
-void rotateClockwise(Cube *cube, Vector3 dir, void (*cubieRotation)(Cubie *)) {
-
+/*----------------------------------------------------------------*/
+// TODO: why is clockwise rotation equals to anti-clockwise on the cube ?
+// depends on the side !
+void rotate(Cube *cube, Vector3 dir, void (*cubieRotation)(Cubie *),
+            bool antiClockwise) {
   Cubie face[SIZE][SIZE];
   int x, y, z;
 
   for (int i = 0; i < SIZE; i++)
     for (int j = 0; j < SIZE; j++) {
-      // x = (dir.x == 0) ? i : (dir.x == -1) ? 0 : SIZE - 1;
-      // y = (dir.y == 0) ? (dir.x == 0) ? j : i : (dir.y == -1) ? 0 : SIZE - 1;
-      // z = (dir.z == -1) ? 0 : (dir.z == 1) ? SIZE - 1 : j;
       x = (dir.x == -1) ? i : dir.x;
       y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
       z = (dir.z == -1) ? j : dir.z;
@@ -152,27 +116,15 @@ void rotateClockwise(Cube *cube, Vector3 dir, void (*cubieRotation)(Cubie *)) {
       face[i][j] = cube->cube[x][y][z];
     }
 
-  //  Transpose the matrix
-  for (int i = 0; i < SIZE; i++)
-    for (int j = i + 1; j < SIZE; j++) {
-      Cubie temp = face[i][j];
-      face[i][j] = face[j][i];
-      face[j][i] = temp;
-    }
+  transposeMatrix(face);
 
-  // Reverse each row
-  for (int j = 0; j < SIZE; j++)
-    for (int i = 0; i < SIZE / 2; i++) {
-      Cubie temp = face[i][j];
-      face[i][j] = face[SIZE - i - 1][j];
-      face[SIZE - i - 1][j] = temp;
-    }
+  if (antiClockwise)
+    reverseRows(face);
+  else
+    reverseColumns(face);
 
   for (int i = 0; i < SIZE; i++)
     for (int j = 0; j < SIZE; j++) {
-      // x = (dir.x == 0) ? i : (dir.x == -1) ? 0 : SIZE - 1;
-      // y = (dir.y == 0) ? (dir.x == 0) ? j : i : (dir.y == -1) ? 0 : SIZE - 1;
-      // z = (dir.z == -1) ? 0 : (dir.z == 1) ? SIZE - 1 : j;
       x = (dir.x == -1) ? i : dir.x;
       y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
       z = (dir.z == -1) ? j : dir.z;
@@ -183,81 +135,77 @@ void rotateClockwise(Cube *cube, Vector3 dir, void (*cubieRotation)(Cubie *)) {
 void Cube_rotate(Cube *cube, Rotation rotation) {
   switch (rotation) {
   case U: {
-    rotateClockwise(cube, (Vector3){-1, SIZE - 1, -1}, Cubie_rotateLeft);
+    rotate(cube, (Vector3){-1, SIZE - 1, -1}, Cubie_rotateLeft, false);
     break;
   }
   case u: {
-    rotateAntiClockwise(cube, (Vector3){-1, SIZE - 1, -1}, Cubie_rotateRight);
+    rotate(cube, (Vector3){-1, SIZE - 1, -1}, Cubie_rotateRight, true);
     break;
   }
   case D: {
-    rotateAntiClockwise(cube, (Vector3){-1, 0, -1}, Cubie_rotateRight);
+    rotate(cube, (Vector3){-1, 0, -1}, Cubie_rotateRight, true);
     break;
   }
   case d: {
-    rotateClockwise(cube, (Vector3){-1, 0, -1}, Cubie_rotateLeft);
+    rotate(cube, (Vector3){-1, 0, -1}, Cubie_rotateLeft, false);
     break;
   }
   case R: {
-    rotateAntiClockwise(cube, (Vector3){SIZE - 1, -1, -1}, Cubie_rotateUp);
+    rotate(cube, (Vector3){SIZE - 1, -1, -1}, Cubie_rotateUp, true);
     break;
   }
   case r: {
-    rotateClockwise(cube, (Vector3){SIZE - 1, -1, -1}, Cubie_rotateDown);
+    rotate(cube, (Vector3){SIZE - 1, -1, -1}, Cubie_rotateDown, false);
     break;
   }
   case L: {
-    rotateClockwise(cube, (Vector3){0, -1, -1}, Cubie_rotateDown);
+    rotate(cube, (Vector3){0, -1, -1}, Cubie_rotateDown, false);
     break;
   }
   case l: {
-    rotateAntiClockwise(cube, (Vector3){0, -1, -1}, Cubie_rotateUp);
+    rotate(cube, (Vector3){0, -1, -1}, Cubie_rotateUp, true);
     break;
   }
   case F: {
-    rotateAntiClockwise(cube, (Vector3){-1, -1, SIZE - 1},
-                        Cubie_rotateClockWise);
+    rotate(cube, (Vector3){-1, -1, SIZE - 1}, Cubie_rotateClockWise, true);
     break;
   }
   case f: {
-    rotateClockwise(cube, (Vector3){-1, -1, SIZE - 1},
-                    Cubie_rotateAntiClockWise);
+    rotate(cube, (Vector3){-1, -1, SIZE - 1}, Cubie_rotateAntiClockWise, false);
     break;
   }
   case B: {
-    rotateClockwise(cube, (Vector3){-1, -1, 0}, Cubie_rotateAntiClockWise);
+    rotate(cube, (Vector3){-1, -1, 0}, Cubie_rotateAntiClockWise, false);
     break;
   }
   case b: {
-    rotateAntiClockwise(cube, (Vector3){-1, -1, 0}, Cubie_rotateClockWise);
+    rotate(cube, (Vector3){-1, -1, 0}, Cubie_rotateClockWise, true);
     break;
   }
   case M: {
-    rotateClockwise(cube, (Vector3){(int)(SIZE / 2), -1, -1}, Cubie_rotateDown);
+    rotate(cube, (Vector3){(int)(SIZE / 2), -1, -1}, Cubie_rotateDown, false);
     break;
   }
   case m: {
-    rotateAntiClockwise(cube, (Vector3){(int)(SIZE / 2), -1, -1},
-                        Cubie_rotateUp);
+    rotate(cube, (Vector3){(int)(SIZE / 2), -1, -1}, Cubie_rotateUp, true);
     break;
   }
   case E: {
-    rotateAntiClockwise(cube, (Vector3){-1, (int)(SIZE / 2), -1},
-                        Cubie_rotateRight);
+    rotate(cube, (Vector3){-1, (int)(SIZE / 2), -1}, Cubie_rotateRight, true);
     break;
   }
   case e: {
-    rotateClockwise(cube, (Vector3){-1, (int)(SIZE / 2), -1}, Cubie_rotateLeft);
+    rotate(cube, (Vector3){-1, (int)(SIZE / 2), -1}, Cubie_rotateLeft, false);
     break;
   }
   case S: {
-    rotateAntiClockwise(cube, (Vector3){-1, -1, (int)(SIZE / 2)},
-                        Cubie_rotateClockWise);
+    rotate(cube, (Vector3){-1, -1, (int)(SIZE / 2)}, Cubie_rotateClockWise,
+           true);
     break;
   }
   case s: {
-    rotateClockwise(cube, (Vector3){-1, -1, (int)(SIZE / 2)},
-                    Cubie_rotateAntiClockWise);
+    rotate(cube, (Vector3){-1, -1, (int)(SIZE / 2)}, Cubie_rotateAntiClockWise,
+           false);
     break;
   }
   case X: {
