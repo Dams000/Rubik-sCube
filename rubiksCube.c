@@ -1,10 +1,8 @@
 #include "cube.h"
 #include "include/raylib.h"
 #include "include/raymath.h"
-#include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
-#include <string.h>
 
 #define CUBIE_SIZE 0.9
 
@@ -82,7 +80,8 @@ void handleKeyPress(Cube *cube) {
 }
 
 void handleMouseMovementAndUpdateCamera() {
-if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) cube = Cube_make(CUBIE_SIZE);
+  if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+    cube = Cube_make(CUBIE_SIZE);
 
   float dt = GetFrameTime();
 
@@ -119,14 +118,7 @@ int main(int argc, char **argv) {
 
   if (argc == 2) {
     char *moves = argv[1];
-    for (size_t i = 0; i < strlen(moves); i++) {
-      char curr = (moves[i] == '2') ? moves[i - 1] : moves[i];
-      if (moves[i + 1] == '\'') {
-        curr = tolower(curr);
-        i++;
-      }
-      Cube_rotate(&cube, getCorrespondingRotation(curr));
-    }
+    Cube_applyMoves(&cube, moves);
   }
 
   while (!WindowShouldClose()) {

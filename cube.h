@@ -40,6 +40,8 @@ Cube Cube_make(float cubletSize);
 
 Rotation getCorrespondingRotation(char c);
 
+void Cube_applyMoves(Cube *cube, char *moves);
+
 void Cube_rotate(Cube *cube, Rotation rotation);
 
 #endif // !CUBE_H

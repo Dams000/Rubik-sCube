@@ -1,6 +1,8 @@
 #include "cube.h"
 #include "cublet.h"
 #include "include/raylib.h"
+#include <ctype.h>
+#include <string.h>
 
 Cube Cube_make(float cubletSize) {
   Cube cube;
@@ -56,6 +58,17 @@ Rotation getCorrespondingRotation(char c) {
     return s;
   default:
     return -1;
+  }
+}
+
+void Cube_applyMoves(Cube *cube, char *moves) {
+  for (size_t i = 0; i < strlen(moves); i++) {
+    char curr = (moves[i] == '2') ? moves[i - 1] : moves[i];
+    if (moves[i + 1] == '\'') {
+      curr = tolower(curr);
+      i++;
+    }
+    Cube_rotate(cube, getCorrespondingRotation(curr));
   }
 }
 
