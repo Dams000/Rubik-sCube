@@ -16,8 +16,7 @@ Cube Cube_make(float cubletSize) {
       for (int z = 0; z < SIZE; z++) {
         if (isInnerCubie(x, y, z))
           continue;
-        cube.cube[x][y][z] =
-            Cubie_make(x, y, z, cubletSize);
+        cube.cube[x][y][z] = Cubie_make(x, y, z, cubletSize);
       }
   return cube;
 }
@@ -187,29 +186,33 @@ void Cube_rotate(Cube *cube, Rotation rotation) {
     break;
   }
   case M: {
-    rotate(cube, (Vector3){(int)(SIZE / 2), -1, -1}, Cubie_rotateDown, false);
+    for (int i = 1; i < SIZE - 1; i++)
+      rotate(cube, (Vector3){i, -1, -1}, Cubie_rotateDown, false);
     break;
   }
   case m: {
-    rotate(cube, (Vector3){(int)(SIZE / 2), -1, -1}, Cubie_rotateUp, true);
+    for (int i = 1; i < SIZE - 1; i++)
+      rotate(cube, (Vector3){i, -1, -1}, Cubie_rotateUp, true);
     break;
   }
   case E: {
-    rotate(cube, (Vector3){-1, (int)(SIZE / 2), -1}, Cubie_rotateRight, true);
+    for (int i = 1; i < SIZE - 1; i++)
+      rotate(cube, (Vector3){-1, i, -1}, Cubie_rotateRight, true);
     break;
   }
   case e: {
-    rotate(cube, (Vector3){-1, (int)(SIZE / 2), -1}, Cubie_rotateLeft, false);
+    for (int i = 1; i < SIZE - 1; i++)
+      rotate(cube, (Vector3){-1, i, -1}, Cubie_rotateLeft, false);
     break;
   }
   case S: {
-    rotate(cube, (Vector3){-1, -1, (int)(SIZE / 2)}, Cubie_rotateClockWise,
-           true);
+    for (int i = 1; i < SIZE - 1; i++)
+      rotate(cube, (Vector3){-1, -1, i}, Cubie_rotateClockWise, true);
     break;
   }
   case s: {
-    rotate(cube, (Vector3){-1, -1, (int)(SIZE / 2)}, Cubie_rotateAntiClockWise,
-           false);
+    for (int i = 1; i < SIZE - 1; i++)
+      rotate(cube, (Vector3){-1, -1, i}, Cubie_rotateAntiClockWise, false);
     break;
   }
   case X: {
