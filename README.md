@@ -4,6 +4,7 @@ Sources:
 - https://en.wikipedia.org/wiki/Spherical_coordinate_system
 - https://ruwix.com/the-rubiks-cube/notation/
 - https://www.javatpoint.com/rotate-matrix-by-90-degrees-in-java
+- https://www.worldcubeassociation.org/regulations/#article-4-scrambling
 
 
 
