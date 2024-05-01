@@ -81,9 +81,8 @@ void handleKeyPress() {
     char *scramble[SCRAMBLE_SIZE];
     generateScramble(scramble);
 
-    for (int i = 0; i < SCRAMBLE_SIZE; i++) {
+    for (int i = 0; i < SCRAMBLE_SIZE; i++)
       Cube_applyMoves(&cube, scramble[i]);
-    }
   }
 }
 
@@ -117,6 +116,8 @@ void handleMouseMovementAndUpdateCamera() {
 }
 
 int main(int argc, char **argv) {
+  SetTraceLogLevel(LOG_WARNING);
+
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(1200, 800, "Rubik's Cube");
   SetWindowMinSize(600, 400);
@@ -142,9 +143,9 @@ int main(int argc, char **argv) {
     DrawLine3D(Vector3Zero(), (Vector3){(float)SIZE / 2 + 2, 0, 0}, GRAY);
     DrawLine3D(Vector3Zero(), (Vector3){0, (float)SIZE / 2 + 2, 0}, GRAY);
     DrawLine3D(Vector3Zero(), (Vector3){0, 0, (float)SIZE / 2 + 2}, GRAY);
-    // DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
-    //          SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
-    //          BLACK);
+    DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
+             SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
+             BLACK);
     for (int z = 0; z < SIZE; z++)
       for (int y = 0; y < SIZE; y++)
         for (int x = 0; x < SIZE; x++)
