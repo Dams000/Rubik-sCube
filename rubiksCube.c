@@ -3,6 +3,7 @@
 #include "scramble.h"
 #include <math.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 #define CUBIE_SIZE 0.9
 
@@ -89,6 +90,12 @@ void handleKeyPress() {
 void handleMouseMovementAndUpdateCamera() {
   if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
     cube = Cube_make(CUBIE_SIZE);
+  else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
+    camera_mag = 20;
+    camera_mag_vel = 0.0f;
+    camera_theta = PI / 4;
+    camera_phi = PI / 4;
+  }
 
   float dt = GetFrameTime();
 
