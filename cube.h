@@ -3,7 +3,7 @@
 
 #include "cublet.h"
 
-#define SIZE 5
+#define SIZE 3
 
 typedef enum Rotations {
   U,

@@ -3,18 +3,30 @@
 #include "scramble.h"
 #include <math.h>
 #include <stdarg.h>
-#include <stdio.h>
 
 #define CUBIE_SIZE 0.9
 
-float camera_mag = 20;
+float camera_mag = 2 * SIZE;
 float camera_mag_vel = 0.0f;
-float camera_theta = PI / 4;
-float camera_phi = PI / 4;
+float camera_theta = PI / 5;
+float camera_phi = PI / 3;
 
 Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
+char *scramble[SCRAMBLE_SIZE];
+
+bool showHelp = false;
+
+char *enter = "Press 'Enter' to scramble the cube.";
+char *rotateFace =
+    "Press the corresponding key to move each face (Hold alt down for "
+    "prime moves):";
+char *facesKey = "R (right), L (left), U (up), D (down), F (front), B (back).";
+char *mouseRight = "Hold right mouse button down to move the camera around.";
+char *mouseMiddle = "Press middle mouse button to reset camera settings.";
+char *mouseLeft =
+    "Press left mouse button to reset the cube to its original solved state.";
 
 void handleKeyPress() {
   if (IsKeyPressed(KEY_U)) {
@@ -79,7 +91,6 @@ void handleKeyPress() {
       Cube_rotate(&cube, Z);
   } else if (IsKeyPressed(KEY_ENTER)) {
     cube = Cube_make(CUBIE_SIZE);
-    char *scramble[SCRAMBLE_SIZE];
     generateScramble(scramble);
 
     for (int i = 0; i < SCRAMBLE_SIZE; i++)
@@ -91,19 +102,19 @@ void handleMouseMovementAndUpdateCamera() {
   if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
     cube = Cube_make(CUBIE_SIZE);
   else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
-    camera_mag = 20;
+    camera_mag = 2 * SIZE;
     camera_mag_vel = 0.0f;
-    camera_theta = PI / 4;
-    camera_phi = PI / 4;
+    camera_theta = PI / 5;
+    camera_phi = PI / 3;
   }
 
   float dt = GetFrameTime();
 
   camera_mag += camera_mag_vel * dt;
-  if (camera_mag < SIZE)
-    camera_mag = SIZE;
-  if (camera_mag > 3 * SIZE)
-    camera_mag = 3 * SIZE;
+  if (camera_mag < 1.25f * SIZE)
+    camera_mag = 1.25f * SIZE;
+  if (camera_mag > 2.5f * SIZE)
+    camera_mag = 2.5f * SIZE;
   camera_mag_vel -= GetMouseWheelMove() * 10;
   camera_mag_vel *= 0.9;
 
@@ -122,12 +133,59 @@ void handleMouseMovementAndUpdateCamera() {
   camera.position.y = cosf(camera_phi) * camera_mag;
 }
 
+void drawHelpScreen() {
+
+  int fontSize =
+      fmax(fmin(floor((float)(GetScreenWidth() - 50) / 400) * 10, 40), 18);
+
+  ClearBackground(LIGHTGRAY);
+  DrawText("Press 'h' to exit.", 10, 10, 20, DARKGRAY);
+  DrawText(enter, GetScreenWidth() / 2 - MeasureText(enter, fontSize) / 2,
+           GetScreenHeight() / 2 - 150, fontSize, BLACK);
+  DrawText(rotateFace,
+           GetScreenWidth() / 2 - MeasureText(rotateFace, fontSize) / 2,
+           GetScreenHeight() / 2 - 100, fontSize, BLACK);
+  DrawText(facesKey, GetScreenWidth() / 2 - MeasureText(facesKey, fontSize) / 2,
+           GetScreenHeight() / 2 - 50, fontSize, BLACK);
+  DrawText(mouseRight,
+           GetScreenWidth() / 2 - MeasureText(mouseRight, fontSize) / 2,
+           GetScreenHeight() / 2, fontSize, BLACK);
+  DrawText(mouseMiddle,
+           GetScreenWidth() / 2 - MeasureText(mouseMiddle, fontSize) / 2,
+           GetScreenHeight() / 2 + 50, fontSize, BLACK);
+  DrawText(mouseLeft,
+           GetScreenWidth() / 2 - MeasureText(mouseLeft, fontSize) / 2,
+           GetScreenHeight() / 2 + 100, fontSize, BLACK);
+}
+
+void drawCube() {
+  BeginMode3D(camera);
+  ClearBackground(LIGHTGRAY);
+
+  DrawLine3D(Vector3Zero(), (Vector3){(float)SIZE / 2 + 2, 0, 0}, GRAY);
+  DrawLine3D(Vector3Zero(), (Vector3){0, (float)SIZE / 2 + 2, 0}, GRAY);
+  DrawLine3D(Vector3Zero(), (Vector3){0, 0, (float)SIZE / 2 + 2}, GRAY);
+  DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
+           SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
+           BLACK);
+  for (int z = 0; z < SIZE; z++)
+    for (int y = 0; y < SIZE; y++)
+      for (int x = 0; x < SIZE; x++)
+        Cubie_drawCubie(&cube.cube[x][y][z],
+                        (Vector3){x - (float)SIZE / 2 + 0.5f,
+                                  y - (float)SIZE / 2 + 0.5f,
+                                  z - (float)SIZE / 2 + 0.5f});
+
+  EndMode3D();
+  DrawText("Press 'h' for help.", 10, 10, 20, DARKGRAY);
+}
+
 int main(int argc, char **argv) {
   SetTraceLogLevel(LOG_WARNING);
 
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(1200, 800, "Rubik's Cube");
-  SetWindowMinSize(600, 400);
+  SetWindowMinSize(800, 600);
   SetTargetFPS(40);
 
   cube = Cube_make(CUBIE_SIZE);
@@ -138,30 +196,21 @@ int main(int argc, char **argv) {
   }
 
   while (!WindowShouldClose()) {
-    handleMouseMovementAndUpdateCamera();
+    if (IsKeyPressed(KEY_H))
+      showHelp = !showHelp;
 
-    handleKeyPress();
+    if (!showHelp) {
+      handleMouseMovementAndUpdateCamera();
+      handleKeyPress();
+    }
 
     BeginDrawing();
 
-    BeginMode3D(camera);
-    ClearBackground(LIGHTGRAY);
+    if (showHelp)
+      drawHelpScreen();
+    else
+      drawCube();
 
-    DrawLine3D(Vector3Zero(), (Vector3){(float)SIZE / 2 + 2, 0, 0}, GRAY);
-    DrawLine3D(Vector3Zero(), (Vector3){0, (float)SIZE / 2 + 2, 0}, GRAY);
-    DrawLine3D(Vector3Zero(), (Vector3){0, 0, (float)SIZE / 2 + 2}, GRAY);
-    DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
-             SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
-             BLACK);
-    for (int z = 0; z < SIZE; z++)
-      for (int y = 0; y < SIZE; y++)
-        for (int x = 0; x < SIZE; x++)
-          Cubie_drawCubie(&cube.cube[x][y][z],
-                          (Vector3){x - (float)SIZE / 2 + 0.5f,
-                                    y - (float)SIZE / 2 + 0.5f,
-                                    z - (float)SIZE / 2 + 0.5f});
-
-    EndMode3D();
     EndDrawing();
   }
 
