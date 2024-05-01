@@ -65,7 +65,8 @@ Rotation getCorrespondingRotation(char c) {
 }
 
 void Cube_applyMoves(Cube *cube, char *moves) {
-  for (size_t i = 0; i < strlen(moves); i++) {
+  size_t len = strlen(moves);
+  for (size_t i = 0; i < len; i++) {
     char curr = (moves[i] == '2') ? moves[i - 1] : moves[i];
     if (moves[i + 1] == '\'') {
       curr = tolower(curr);
