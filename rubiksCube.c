@@ -1,6 +1,6 @@
 #include "cube.h"
 #include "include/raylib.h"
-#include "include/raymath.h"
+#include "scramble.h"
 #include <math.h>
 #include <stdarg.h>
 
@@ -76,6 +76,14 @@ void handleKeyPress() {
       Cube_rotate(&cube, z);
     else
       Cube_rotate(&cube, Z);
+  } else if (IsKeyPressed(KEY_ENTER)) {
+    cube = Cube_make(CUBIE_SIZE);
+    char *scramble[SCRAMBLE_SIZE];
+    generateScramble(scramble);
+
+    for (int i = 0; i < SCRAMBLE_SIZE; i++) {
+      Cube_applyMoves(&cube, scramble[i]);
+    }
   }
 }
 
