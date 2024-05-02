@@ -3,6 +3,7 @@
 #include "scramble.h"
 #include <math.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #define CUBIE_SIZE 0.9
 
@@ -31,70 +32,72 @@ char *mouseLeft =
 void handleKeyPress() {
   if (IsKeyPressed(KEY_U)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, u);
+      Cube_rotate(&cube, u, 1);
     else
-      Cube_rotate(&cube, U);
+      Cube_rotate(&cube, U, 1);
   } else if (IsKeyPressed(KEY_D)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, d);
+      Cube_rotate(&cube, d, 1);
     else
-      Cube_rotate(&cube, D);
+      Cube_rotate(&cube, D, 1);
   } else if (IsKeyPressed(KEY_L)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, l);
+      Cube_rotate(&cube, l, 1);
     else
-      Cube_rotate(&cube, L);
+      Cube_rotate(&cube, L, 1);
   } else if (IsKeyPressed(KEY_R)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, r);
+      Cube_rotate(&cube, r, 1);
     else
-      Cube_rotate(&cube, R);
+      Cube_rotate(&cube, R, 1);
   } else if (IsKeyPressed(KEY_F)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, f);
+      Cube_rotate(&cube, f, 1);
     else
-      Cube_rotate(&cube, F);
+      Cube_rotate(&cube, F, 1);
   } else if (IsKeyPressed(KEY_B)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, b);
+      Cube_rotate(&cube, b, 1);
     else
-      Cube_rotate(&cube, B);
+      Cube_rotate(&cube, B, 1);
   } else if (IsKeyPressed(KEY_M)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, m);
+      Cube_rotate(&cube, m, 1);
     else
-      Cube_rotate(&cube, M);
+      Cube_rotate(&cube, M, 1);
   } else if (IsKeyPressed(KEY_E)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, e);
+      Cube_rotate(&cube, e, 1);
     else
-      Cube_rotate(&cube, E);
+      Cube_rotate(&cube, E, 1);
   } else if (IsKeyPressed(KEY_S)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, s);
+      Cube_rotate(&cube, s, 1);
     else
-      Cube_rotate(&cube, S);
+      Cube_rotate(&cube, S, 1);
   } else if (IsKeyPressed(KEY_X)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, x);
+      Cube_rotate(&cube, x, 1);
     else
-      Cube_rotate(&cube, X);
+      Cube_rotate(&cube, X, 1);
   } else if (IsKeyPressed(KEY_Y)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, y);
+      Cube_rotate(&cube, y, 1);
     else
-      Cube_rotate(&cube, Y);
+      Cube_rotate(&cube, Y, 1);
   } else if (IsKeyPressed(KEY_Z)) {
     if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, z);
+      Cube_rotate(&cube, z, 1);
     else
-      Cube_rotate(&cube, Z);
+      Cube_rotate(&cube, Z, 1);
   } else if (IsKeyPressed(KEY_ENTER)) {
     cube = Cube_make(CUBIE_SIZE);
     generateScramble(scramble);
 
-    for (int i = 0; i < SCRAMBLE_SIZE; i++)
+    for (int i = 0; i < SCRAMBLE_SIZE; i++) {
       Cube_applyMoves(&cube, scramble[i]);
+      free(scramble[i]);
+    }
   }
 }
 
@@ -136,7 +139,7 @@ void handleMouseMovementAndUpdateCamera() {
 void drawHelpScreen() {
 
   int fontSize =
-      fmax(fmin(floor((float)(GetScreenWidth() - 50) / 400) * 10, 40), 18);
+      fmax(fmin(floor((float)(GetScreenWidth() - 100) / 400) * 10, 40), 18);
 
   ClearBackground(LIGHTGRAY);
   DrawText("Press 'h' to exit.", 10, 10, 20, DARKGRAY);

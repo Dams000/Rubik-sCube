@@ -3,7 +3,7 @@
 
 #include "cublet.h"
 
-#define SIZE 3
+#define SIZE 4
 
 typedef enum Rotations {
   U,
@@ -42,6 +42,6 @@ Rotation getCorrespondingRotation(char c);
 
 void Cube_applyMoves(Cube *cube, char *moves);
 
-void Cube_rotate(Cube *cube, Rotation rotation);
+void Cube_rotate(Cube *cube, Rotation rotation, int numberOfLayers);
 
 #endif // !CUBE_H
