@@ -5,6 +5,9 @@ Sources:
 - https://ruwix.com/the-rubiks-cube/notation/
 - https://www.javatpoint.com/rotate-matrix-by-90-degrees-in-java
 - https://www.worldcubeassociation.org/regulations/#article-4-scrambling
+- https://en.cppreference.com/w/c/io/fprintf
+- https://en.cppreference.com/w/c/string/byte/strcpy
+- https://en.cppreference.com/w/c/experimental/dynamic/strdup
 
 
 
