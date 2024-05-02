@@ -1,4 +1,5 @@
 #include "scramble.h"
+#include "cube.h"
 #include "include/raylib.h"
 #include <stdio.h>
 #include <string.h>
@@ -17,31 +18,46 @@ char **generateScramble(char *sequence[SCRAMBLE_SIZE]) {
 
   while (sequenceLength < SCRAMBLE_SIZE) {
     int rand = GetRandomValue(0, 17);
+    int n = GetRandomValue(1, SIZE / 2);
     char *currentMove = possibleMoves[rand];
 
+    const char layers[] = "%dw%s";
+    int size = snprintf(NULL, 0, layers, n, currentMove);
+    char fullMove[size + 1];
+    snprintf(fullMove, sizeof fullMove, layers, n, currentMove);
+
     if (sequenceLength < 1) {
-      sequence[sequenceLength] = currentMove;
+      sequence[sequenceLength] = strdup(fullMove);
       sequenceLength++;
       continue;
     }
 
     char *lastMove = sequence[sequenceLength - 1];
 
-    if (strcmp(currentMove, lastMove) == 0 || currentMove[0] == lastMove[0])
+    if (strcmp(fullMove, lastMove) == 0 || fullMove[2] == lastMove[2])
       continue;
     if (sequenceLength > 1) {
       char *secondtoLastMove = sequence[sequenceLength - 2];
-      if (currentMove[0] == secondtoLastMove[0] &&
-          areOppsitefaces(currentMove[0], lastMove[0]))
+      if (fullMove[2] == secondtoLastMove[2] &&
+          areOppsitefaces(fullMove[2], lastMove[2]))
         continue;
     }
 
-    sequence[sequenceLength] = currentMove;
+    sequence[sequenceLength] = strdup(fullMove);
+
     sequenceLength++;
   }
 
-  for (int i = 0; i < sequenceLength; i++)
-    printf("%s ", sequence[i]);
+  for (int i = 0; i < sequenceLength; i++) {
+    if (sequence[i][0] == '1') {
+      int len = strlen(sequence[i]);
+      for (int c = 2; c < len; c++) {
+        printf("%c", sequence[i][c]);
+      }
+      printf(" ");
+    } else
+      printf("%s ", sequence[i]);
+  }
   printf("\n");
 
   return sequence;
