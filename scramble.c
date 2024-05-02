@@ -49,13 +49,9 @@ char **generateScramble(char *sequence[SCRAMBLE_SIZE]) {
   }
 
   for (int i = 0; i < sequenceLength; i++) {
-    if (sequence[i][0] == '1') {
-      int len = strlen(sequence[i]);
-      for (int c = 2; c < len; c++) {
-        printf("%c", sequence[i][c]);
-      }
-      printf(" ");
-    } else
+    if (sequence[i][0] == '1')
+      printf("%s ", sequence[i] + 2);
+    else
       printf("%s ", sequence[i]);
   }
   printf("\n");
