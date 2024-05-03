@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CUBIE_SIZE 0.9
+#define CUBIE_SIZE 0.5
 
 float camera_mag = 2 * SIZE;
 float camera_mag_vel = 0.0f;
@@ -120,8 +120,8 @@ void handleMouseMovementAndUpdateCamera() {
   float dt = GetFrameTime();
 
   camera_mag += camera_mag_vel * dt;
-  if (camera_mag < 1.25f * SIZE)
-    camera_mag = 1.25f * SIZE;
+  // if (camera_mag < 1.25f * SIZE)
+    // camera_mag = 1.25f * SIZE;
   if (camera_mag > 2.5f * SIZE)
     camera_mag = 2.5f * SIZE;
   camera_mag_vel -= GetMouseWheelMove() * 10;
@@ -174,16 +174,11 @@ void drawCube() {
   DrawLine3D(Vector3Zero(), (Vector3){(float)SIZE / 2 + 2, 0, 0}, GRAY);
   DrawLine3D(Vector3Zero(), (Vector3){0, (float)SIZE / 2 + 2, 0}, GRAY);
   DrawLine3D(Vector3Zero(), (Vector3){0, 0, (float)SIZE / 2 + 2}, GRAY);
-  DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
-           SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
-           BLACK);
-  for (int z = 0; z < SIZE; z++)
-    for (int y = 0; y < SIZE; y++)
-      for (int x = 0; x < SIZE; x++)
-        Cubie_drawCubie(&cube.cube[x][y][z],
-                        (Vector3){x - (float)SIZE / 2 + 0.5f,
-                                  y - (float)SIZE / 2 + 0.5f,
-                                  z - (float)SIZE / 2 + 0.5f});
+  // DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
+  //          SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
+  //          BLACK);
+  Cube_drawCube(&cube);
+  
 
   EndMode3D();
   DrawText("Press 'h' for help.", 10, 10, 20, DARKGRAY);
