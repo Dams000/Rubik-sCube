@@ -1,6 +1,7 @@
 #include "cube.h"
 #include "scramble.h"
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -92,6 +93,7 @@ void handleKeyPress() {
       Cube_rotate(&cube, Z, 1);
   } else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
+    Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     generateScramble(scramble, SIZE);
 
@@ -109,6 +111,7 @@ void handleKeyPress() {
 
 void handleMouseMovementAndUpdateCamera() {
   if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+    Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     currentScramble[0] = '\0';
   } else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
@@ -198,7 +201,8 @@ int main(int argc, char **argv) {
   SetWindowMinSize(800, 600);
   SetTargetFPS(40);
 
-  cube = Cube_make(CUBIE_SIZE);
+  cube = Cube_make(0.9f);
+  printf("oki \n");
 
   if (argc == 2) {
     char *moves = argv[1];
@@ -223,6 +227,8 @@ int main(int argc, char **argv) {
 
     EndDrawing();
   }
+
+  Cube_free(cube);
 
   CloseWindow();
   return 0;

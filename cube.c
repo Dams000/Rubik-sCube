@@ -2,6 +2,7 @@
 #include "include/raylib.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 bool isInnerCubie(float x, float y, float z) {
@@ -11,14 +12,29 @@ bool isInnerCubie(float x, float y, float z) {
 
 Cube Cube_make(float cubletSize) {
   Cube cube;
-  for (unsigned short int x = 0; x < SIZE; x++)
-    for (unsigned short int y = 0; y < SIZE; y++)
+  cube.cube = (Cubie***)malloc(SIZE * sizeof(Cubie**));
+  for (unsigned short int x = 0; x < SIZE; x++) {
+    cube.cube[x] = (Cubie**)malloc(SIZE * sizeof(Cubie*));
+    for (unsigned short int y = 0; y < SIZE; y++) {
+      cube.cube[x][y] = (Cubie*)malloc(SIZE * sizeof(Cubie));
       for (unsigned short int z = 0; z < SIZE; z++) {
         if (isInnerCubie(x, y, z))
           continue;
         cube.cube[x][y][z] = Cubie_make(x, y, z, cubletSize, SIZE);
       }
+    }
+  }
   return cube;
+}
+
+void Cube_free(Cube cube) {
+  for (unsigned short int x = 0; x < SIZE; x++) {
+    for (unsigned short int y = 0; y < SIZE; y++) {
+      free(cube.cube[x][y]);
+    }
+    free(cube.cube[x]);
+  }
+  free(cube.cube);
 }
 
 void Cube_drawCube(Cube *cube) {
