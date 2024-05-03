@@ -25,11 +25,14 @@ Cube Cube_make(float cubletSize) {
 void Cube_drawCube(Cube *cube) {
   for (int x = 0; x < SIZE; x++)
     for (int y = 0; y < SIZE; y++)
-      for (int z = 0; z < SIZE; z++)
+      for (int z = 0; z < SIZE; z++) {
+        if (isInnerCubie(x, y, z))
+          continue;
         Cubie_drawCubie(&cube->cube[x][y][z],
                         (Vector3){x - (float)SIZE / 2 + 0.5f,
                                   y - (float)SIZE / 2 + 0.5f,
                                   z - (float)SIZE / 2 + 0.5f});
+      }
 }
 
 Rotation getCorrespondingRotation(char c) {
@@ -129,6 +132,7 @@ void rotate(Cube *cube, Vector3 dir, void (*cubieRotation)(Cubie *),
       x = (dir.x == -1) ? i : dir.x;
       y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
       z = (dir.z == -1) ? j : dir.z;
+      // printf("%d %d %d\n", x, y, z);
       cubieRotation(&cube->cube[x][y][z]);
       face[i][j] = cube->cube[x][y][z];
     }
@@ -145,6 +149,7 @@ void rotate(Cube *cube, Vector3 dir, void (*cubieRotation)(Cubie *),
       x = (dir.x == -1) ? i : dir.x;
       y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
       z = (dir.z == -1) ? j : dir.z;
+      // printf("%d %d %d\n", x, y, z);
       cube->cube[x][y][z] = face[i][j];
     }
 }
