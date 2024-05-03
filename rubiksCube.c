@@ -24,10 +24,10 @@ char *rotateFace =
     "Press the corresponding key to move each face (Hold alt down for "
     "prime moves):";
 char *facesKey = "R (right), L (left), U (up), D (down), F (front), B (back).";
-char *mouseRight = "Hold right mouse button down to move the camera around.";
+char *mouseRight =
+    "Press right mouse button to reset the cube to its original, solved state.";
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
-char *mouseLeft =
-    "Press left mouse button to reset the cube to its original, solved state.";
+char *mouseLeft = "Hold left mouse button down to move the camera around.";
 
 void handleKeyPress() {
   if (IsKeyPressed(KEY_U)) {
