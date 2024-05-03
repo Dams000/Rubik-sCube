@@ -8,7 +8,7 @@ Sources:
 - https://en.cppreference.com/w/c/io/fprintf
 - https://en.cppreference.com/w/c/string/byte/strcpy
 - https://en.cppreference.com/w/c/experimental/dynamic/strdup
-
+- https://www.speedsolving.com/wiki/index.php/Scrambling
 
 
 
