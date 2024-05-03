@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CUBIE_SIZE 0.5
+#define CUBIE_SIZE 0.9
 
 float camera_mag = 2 * SIZE;
 float camera_mag_vel = 0.0f;
@@ -108,9 +108,10 @@ void handleKeyPress() {
 }
 
 void handleMouseMovementAndUpdateCamera() {
-  if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+  if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
     cube = Cube_make(CUBIE_SIZE);
-  else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
+    currentScramble[0] = '\0';
+  } else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
     camera_mag = 2 * SIZE;
     camera_mag_vel = 0.0f;
     camera_theta = PI / 5;
@@ -120,8 +121,8 @@ void handleMouseMovementAndUpdateCamera() {
   float dt = GetFrameTime();
 
   camera_mag += camera_mag_vel * dt;
-  // if (camera_mag < 1.25f * SIZE)
-    // camera_mag = 1.25f * SIZE;
+  if (camera_mag < 1.25f * SIZE)
+    camera_mag = 1.25f * SIZE;
   if (camera_mag > 2.5f * SIZE)
     camera_mag = 2.5f * SIZE;
   camera_mag_vel -= GetMouseWheelMove() * 10;
@@ -174,11 +175,10 @@ void drawCube() {
   DrawLine3D(Vector3Zero(), (Vector3){(float)SIZE / 2 + 2, 0, 0}, GRAY);
   DrawLine3D(Vector3Zero(), (Vector3){0, (float)SIZE / 2 + 2, 0}, GRAY);
   DrawLine3D(Vector3Zero(), (Vector3){0, 0, (float)SIZE / 2 + 2}, GRAY);
-  // DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
-  //          SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
-  //          BLACK);
+  DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
+           SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
+           BLACK);
   Cube_drawCube(&cube);
-  
 
   EndMode3D();
   DrawText("Press 'h' for help.", 10, 10, 20, DARKGRAY);
