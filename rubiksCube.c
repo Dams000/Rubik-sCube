@@ -93,7 +93,7 @@ void handleKeyPress() {
   } else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
     cube = Cube_make(CUBIE_SIZE);
-    generateScramble(scramble);
+    generateScramble(scramble, SIZE);
 
     for (int i = 0; i < SCRAMBLE_SIZE; i++) {
       Cube_applyMoves(&cube, scramble[i]);

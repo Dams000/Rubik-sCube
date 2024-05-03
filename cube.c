@@ -1,5 +1,4 @@
 #include "cube.h"
-#include "cublet.h"
 #include "include/raylib.h"
 #include <ctype.h>
 #include <stdio.h>
@@ -12,20 +11,20 @@ bool isInnerCubie(float x, float y, float z) {
 
 Cube Cube_make(float cubletSize) {
   Cube cube;
-  for (int x = 0; x < SIZE; x++)
-    for (int y = 0; y < SIZE; y++)
-      for (int z = 0; z < SIZE; z++) {
+  for (unsigned short int x = 0; x < SIZE; x++)
+    for (unsigned short int y = 0; y < SIZE; y++)
+      for (unsigned short int z = 0; z < SIZE; z++) {
         if (isInnerCubie(x, y, z))
           continue;
-        cube.cube[x][y][z] = Cubie_make(x, y, z, cubletSize);
+        cube.cube[x][y][z] = Cubie_make(x, y, z, cubletSize, SIZE);
       }
   return cube;
 }
 
 void Cube_drawCube(Cube *cube) {
-  for (int x = 0; x < SIZE; x++)
-    for (int y = 0; y < SIZE; y++)
-      for (int z = 0; z < SIZE; z++) {
+  for (unsigned short int x = 0; x < SIZE; x++)
+    for (unsigned short int y = 0; y < SIZE; y++)
+      for (unsigned short int z = 0; z < SIZE; z++) {
         if (isInnerCubie(x, y, z))
           continue;
         Cubie_drawCubie(&cube->cube[x][y][z],
@@ -78,18 +77,50 @@ Rotation getCorrespondingRotation(char c) {
   }
 }
 
+char getRotation(const char *move, size_t len) {
+  if (move[len - 1] == '\'')
+    return tolower(move[len - 2]);
+  else if (move[len - 1] == '2')
+    return move[len - 2];
+  else
+    return move[len - 1];
+}
+
 void Cube_applyMoves(Cube *cube, char *move) {
   size_t len = strlen(move);
   char nbOfLayers = move[0] - '0';
-  char face;
-  if (move[len - 1] == '\'')
-    face = tolower(move[len - 2]);
-  else if (move[len - 1] == '2') {
-    face = move[len - 2];
-    Cube_rotate(cube, getCorrespondingRotation(face), nbOfLayers);
-  } else
-    face = move[len - 1];
-  Cube_rotate(cube, getCorrespondingRotation(face), nbOfLayers);
+  char rotation = getRotation(move, len);
+  if (move[len - 1] == '2')
+    Cube_rotate(cube, getCorrespondingRotation(rotation), nbOfLayers);
+  Cube_rotate(cube, getCorrespondingRotation(rotation), nbOfLayers);
+}
+
+/*----------------------------------------------------------------*/
+
+unsigned short int calculateX(int dirX, int i) {
+  return (dirX == -1) ? i : dirX;
+}
+
+unsigned short int calculateY(int dirX, int dirY, int i, int j) {
+  return (dirY == -1) ? (dirX == -1) ? j : i : dirY;
+}
+
+unsigned short int calculateZ(int dirZ, int j) {
+  return (dirZ == -1) ? j : dirZ;
+}
+
+void storeFaceAndRotateCubies(Cube *cube, Vector3 dir,
+                              void (*cubieRotation)(Cubie *),
+                              Cubie face[SIZE][SIZE]) {
+  unsigned short int x, y, z;
+  for (int i = 0; i < SIZE; i++)
+    for (int j = 0; j < SIZE; j++) {
+      x = calculateX(dir.x, i);
+      y = calculateY(dir.x, dir.y, i, j);
+      z = calculateZ(dir.z, j);
+      cubieRotation(&cube->cube[x][y][z]);
+      face[i][j] = cube->cube[x][y][z];
+    }
 }
 
 void transposeMatrix(Cubie face[SIZE][SIZE]) {
@@ -119,39 +150,29 @@ void reverseColumns(Cubie face[SIZE][SIZE]) {
     }
 }
 
-/*----------------------------------------------------------------*/
+void updateCubeFace(Cube *cube, Vector3 dir, Cubie face[SIZE][SIZE]) {
+  unsigned short int x, y, z;
+  for (int i = 0; i < SIZE; i++)
+    for (int j = 0; j < SIZE; j++) {
+      x = calculateX(dir.x, i);
+      y = calculateY(dir.x, dir.y, i, j);
+      z = calculateZ(dir.z, j);
+      cube->cube[x][y][z] = face[i][j];
+    }
+}
+
 // TODO: why is clockwise rotation equals to anti-clockwise on the cube ?
 // depends on the side !
 void rotate(Cube *cube, Vector3 dir, void (*cubieRotation)(Cubie *),
             bool antiClockwise) {
   Cubie face[SIZE][SIZE];
-  int x, y, z;
-
-  for (int i = 0; i < SIZE; i++)
-    for (int j = 0; j < SIZE; j++) {
-      x = (dir.x == -1) ? i : dir.x;
-      y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
-      z = (dir.z == -1) ? j : dir.z;
-      // printf("%d %d %d\n", x, y, z);
-      cubieRotation(&cube->cube[x][y][z]);
-      face[i][j] = cube->cube[x][y][z];
-    }
-
+  storeFaceAndRotateCubies(cube, dir, cubieRotation, face);
   transposeMatrix(face);
-
   if (antiClockwise)
     reverseRows(face);
   else
     reverseColumns(face);
-
-  for (int i = 0; i < SIZE; i++)
-    for (int j = 0; j < SIZE; j++) {
-      x = (dir.x == -1) ? i : dir.x;
-      y = (dir.y == -1) ? (dir.x == -1) ? j : i : dir.y;
-      z = (dir.z == -1) ? j : dir.z;
-      // printf("%d %d %d\n", x, y, z);
-      cube->cube[x][y][z] = face[i][j];
-    }
+  updateCubeFace(cube, dir, face);
 }
 
 void Cube_rotate(Cube *cube, Rotation rotation, int numberOfLayers) {
