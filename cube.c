@@ -12,11 +12,11 @@ bool isInnerCubie(float x, float y, float z) {
 
 Cube Cube_make(float cubletSize) {
   Cube cube;
-  cube.cube = (Cubie***)malloc(SIZE * sizeof(Cubie**));
+  cube.cube = (Cubie ***)malloc(SIZE * sizeof(Cubie **));
   for (unsigned short int x = 0; x < SIZE; x++) {
-    cube.cube[x] = (Cubie**)malloc(SIZE * sizeof(Cubie*));
+    cube.cube[x] = (Cubie **)malloc(SIZE * sizeof(Cubie *));
     for (unsigned short int y = 0; y < SIZE; y++) {
-      cube.cube[x][y] = (Cubie*)malloc(SIZE * sizeof(Cubie));
+      cube.cube[x][y] = (Cubie *)malloc(SIZE * sizeof(Cubie));
       for (unsigned short int z = 0; z < SIZE; z++) {
         if (isInnerCubie(x, y, z))
           continue;
@@ -104,7 +104,11 @@ char getRotation(const char *move, size_t len) {
 
 void Cube_applyMoves(Cube *cube, char *move) {
   size_t len = strlen(move);
-  char nbOfLayers = move[0] - '0';
+  int nbOfLayers;
+  if (move[1] == 'w')
+    nbOfLayers = move[0] - '0';
+  else
+    nbOfLayers = (move[0] - '0') * 10 + move[1] - '0';
   char rotation = getRotation(move, len);
   if (move[len - 1] == '2')
     Cube_rotate(cube, getCorrespondingRotation(rotation), nbOfLayers);

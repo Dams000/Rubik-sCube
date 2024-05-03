@@ -16,7 +16,7 @@ Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
 char *scramble[SCRAMBLE_SIZE];
-char currentScramble[5 * SCRAMBLE_SIZE + 1];
+char currentScramble[6 * SCRAMBLE_SIZE + 1];
 
 bool showHelp = false;
 
@@ -99,7 +99,7 @@ void handleKeyPress() {
 
     for (int i = 0; i < SCRAMBLE_SIZE; i++) {
       Cube_applyMoves(&cube, scramble[i]);
-      if (scramble[i][0] == '1')
+      if (scramble[i][0] == '1' && scramble[i][1] == 'w')
         strcat(currentScramble, scramble[i] + 2);
       else
         strcat(currentScramble, scramble[i]);
