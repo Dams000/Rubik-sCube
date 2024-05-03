@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define CUBIE_SIZE 0.9
 
@@ -16,6 +17,7 @@ Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
 char *scramble[SCRAMBLE_SIZE];
+char currentScramble[5 * SCRAMBLE_SIZE + 1];
 
 bool showHelp = false;
 
@@ -27,7 +29,7 @@ char *facesKey = "R (right), L (left), U (up), D (down), F (front), B (back).";
 char *mouseRight = "Hold right mouse button down to move the camera around.";
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
 char *mouseLeft =
-    "Press left mouse button to reset the cube to its original solved state.";
+    "Press left mouse button to reset the cube to its original, solved state.";
 
 void handleKeyPress() {
   if (IsKeyPressed(KEY_U)) {
@@ -91,12 +93,18 @@ void handleKeyPress() {
     else
       Cube_rotate(&cube, Z, 1);
   } else if (IsKeyPressed(KEY_ENTER)) {
+    currentScramble[0] = '\0';
     cube = Cube_make(CUBIE_SIZE);
     generateScramble(scramble);
 
     for (int i = 0; i < SCRAMBLE_SIZE; i++) {
       Cube_applyMoves(&cube, scramble[i]);
+      if (scramble[i][0] == '1')
+        strcat(currentScramble, scramble[i] + 2);
+      else
+        strcat(currentScramble, scramble[i]);
       free(scramble[i]);
+      strcat(currentScramble, " ");
     }
   }
 }
@@ -181,6 +189,12 @@ void drawCube() {
 
   EndMode3D();
   DrawText("Press 'h' for help.", 10, 10, 20, DARKGRAY);
+  DrawText("Current scramble:",
+           GetScreenWidth() / 2 - MeasureText("Current scramble:", 30) / 2, 10,
+           30, BLACK);
+  DrawText(currentScramble,
+           GetScreenWidth() / 2 - MeasureText(currentScramble, 20) / 2, 50, 20,
+           BLACK);
 }
 
 int main(int argc, char **argv) {
