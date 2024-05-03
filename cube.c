@@ -22,6 +22,16 @@ Cube Cube_make(float cubletSize) {
   return cube;
 }
 
+void Cube_drawCube(Cube *cube) {
+  for (int x = 0; x < SIZE; x++)
+    for (int y = 0; y < SIZE; y++)
+      for (int z = 0; z < SIZE; z++)
+        Cubie_drawCubie(&cube->cube[x][y][z],
+                        (Vector3){x - (float)SIZE / 2 + 0.5f,
+                                  y - (float)SIZE / 2 + 0.5f,
+                                  z - (float)SIZE / 2 + 0.5f});
+}
+
 Rotation getCorrespondingRotation(char c) {
   switch (c) {
   case 'U':
@@ -143,14 +153,12 @@ void Cube_rotate(Cube *cube, Rotation rotation, int numberOfLayers) {
   switch (rotation) {
   case U: {
     for (int i = 0; i < numberOfLayers; i++)
-      rotate(cube, (Vector3){-1, SIZE - i - 1, -1}, Cubie_rotateLeft,
-             false);
+      rotate(cube, (Vector3){-1, SIZE - i - 1, -1}, Cubie_rotateLeft, false);
     break;
   }
   case u: {
     for (int i = 0; i < numberOfLayers; i++)
-      rotate(cube, (Vector3){-1, SIZE - i - 1, -1}, Cubie_rotateRight,
-             true);
+      rotate(cube, (Vector3){-1, SIZE - i - 1, -1}, Cubie_rotateRight, true);
     break;
   }
   case D: {
@@ -165,14 +173,12 @@ void Cube_rotate(Cube *cube, Rotation rotation, int numberOfLayers) {
   }
   case R: {
     for (int i = 0; i < numberOfLayers; i++)
-      rotate(cube, (Vector3){SIZE - i - 1, -1, -1}, Cubie_rotateUp,
-             true);
+      rotate(cube, (Vector3){SIZE - i - 1, -1, -1}, Cubie_rotateUp, true);
     break;
   }
   case r: {
     for (int i = 0; i < numberOfLayers; i++)
-      rotate(cube, (Vector3){SIZE - i - 1, -1, -1}, Cubie_rotateDown,
-             false);
+      rotate(cube, (Vector3){SIZE - i - 1, -1, -1}, Cubie_rotateDown, false);
     break;
   }
   case L: {
@@ -187,14 +193,14 @@ void Cube_rotate(Cube *cube, Rotation rotation, int numberOfLayers) {
   }
   case F: {
     for (int i = 0; i < numberOfLayers; i++)
-      rotate(cube, (Vector3){-1, -1, SIZE - i - 1},
-             Cubie_rotateClockWise, true);
+      rotate(cube, (Vector3){-1, -1, SIZE - i - 1}, Cubie_rotateClockWise,
+             true);
     break;
   }
   case f: {
     for (int i = 0; i < numberOfLayers; i++)
-      rotate(cube, (Vector3){-1, -1, SIZE - i - 1},
-             Cubie_rotateAntiClockWise, false);
+      rotate(cube, (Vector3){-1, -1, SIZE - i - 1}, Cubie_rotateAntiClockWise,
+             false);
     break;
   }
   case B: {

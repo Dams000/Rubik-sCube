@@ -1,7 +1,5 @@
 #include "cube.h"
-#include "include/raylib.h"
 #include "scramble.h"
-#include <math.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>

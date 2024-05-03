@@ -12,8 +12,6 @@ typedef struct Cubie {
 
 Cubie Cubie_make(int x, int y, int z, float sideLength);
 
-void Cubie_setCoordinates(Cubie *cubie, float x, float y, float z);
-
 void Cubie_rotateRight(Cubie *cubie);
 
 void Cubie_rotateLeft(Cubie *cubie);

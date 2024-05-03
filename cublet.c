@@ -15,12 +15,6 @@ Cubie Cubie_make(int x, int y, int z, float sideLength) {
                  .sideLength = sideLength};
 }
 
-void Cubie_setCoordinates(Cubie *cubie, float x, float y, float z) {
-  cubie->position.x = x;
-  cubie->position.y = y;
-  cubie->position.z = z;
-}
-
 void Cubie_rotateRight(Cubie *cubie) {
   Color tmp = cubie->colors[FRONT];
   cubie->colors[FRONT] = cubie->colors[LEFT];
