@@ -238,39 +238,39 @@ void Cube_rotate(Cube *cube, Rotation rotation, int numberOfLayers) {
     break;
   }
   case X: {
-    Cube_rotate(cube, R, 1);
-    Cube_rotate(cube, m, 1);
-    Cube_rotate(cube, l, 1);
+    Cube_rotate(cube, R, SIZE / 2);
+    Cube_rotate(cube, m, SIZE / 2);
+    Cube_rotate(cube, l, SIZE / 2);
     break;
   }
   case x: {
-    Cube_rotate(cube, r, 1);
-    Cube_rotate(cube, M, 1);
-    Cube_rotate(cube, L, 1);
+    Cube_rotate(cube, r, SIZE / 2);
+    Cube_rotate(cube, M, SIZE / 2);
+    Cube_rotate(cube, L, SIZE / 2);
     break;
   }
   case Y: {
-    Cube_rotate(cube, U, 1);
-    Cube_rotate(cube, e, 1);
-    Cube_rotate(cube, d, 1);
+    Cube_rotate(cube, U, SIZE / 2);
+    Cube_rotate(cube, e, SIZE / 2);
+    Cube_rotate(cube, d, SIZE / 2);
     break;
   }
   case y: {
-    Cube_rotate(cube, u, 1);
-    Cube_rotate(cube, E, 1);
-    Cube_rotate(cube, D, 1);
+    Cube_rotate(cube, u, SIZE / 2);
+    Cube_rotate(cube, E, SIZE / 2);
+    Cube_rotate(cube, D, SIZE / 2);
     break;
   }
   case Z: {
-    Cube_rotate(cube, F, 1);
-    Cube_rotate(cube, S, 1);
-    Cube_rotate(cube, b, 1);
+    Cube_rotate(cube, F, SIZE / 2);
+    Cube_rotate(cube, S, SIZE / 2);
+    Cube_rotate(cube, b, SIZE / 2);
     break;
   }
   case z: {
-    Cube_rotate(cube, f, 1);
-    Cube_rotate(cube, s, 1);
-    Cube_rotate(cube, B, 1);
+    Cube_rotate(cube, f, SIZE / 2);
+    Cube_rotate(cube, s, SIZE / 2);
+    Cube_rotate(cube, B, SIZE / 2);
     break;
   }
   }
