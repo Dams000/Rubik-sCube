@@ -31,7 +31,7 @@ char **generateScramble(char *sequence[SCRAMBLE_SIZE],
 
   while (sequenceLength < SCRAMBLE_SIZE) {
     unsigned short int rand = GetRandomValue(0, 17);
-    unsigned short int n = GetRandomValue(1, cubeSize / 2);
+    unsigned short int n = (cubeSize == 1) ? 1 : GetRandomValue(1, cubeSize / 2);
     const char *currentMove = possibleMoves[rand];
 
     const char layers[] = "%dw%s";
