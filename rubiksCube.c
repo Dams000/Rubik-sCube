@@ -1,4 +1,5 @@
 #include "cube.h"
+#include "include/raylib.h"
 #include "scramble.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -173,6 +174,25 @@ void drawHelpScreen() {
            GetScreenHeight() / 2 + 100, fontSize, BLACK);
 }
 
+void DrawTextBoxed(const char *text, float fontSize, int y) {
+  if (strlen(text) == 0) return;
+  int lastSpace = 0;
+  char *dup = strdup(text);
+  char *lastSpacePtr = strrchr(dup, ' ');
+  lastSpace = (lastSpacePtr != NULL) ? lastSpacePtr - dup : -1;
+  while (MeasureText(dup, fontSize) > GetScreenWidth() - 20) {
+    if (lastSpace == -1)
+      break;
+    dup[lastSpace] = '\0';
+    lastSpacePtr = strrchr(dup, ' ');
+    lastSpace = (lastSpacePtr != NULL) ? lastSpacePtr - dup : -1;
+  }
+  DrawText(dup, GetScreenWidth() / 2 - MeasureText(dup, fontSize) / 2, y,
+           fontSize, BLACK);
+  DrawTextBoxed(text + strlen(dup) + 1, fontSize, y + 30);
+  free(dup);
+}
+
 void drawCube() {
   BeginMode3D(camera);
   ClearBackground(LIGHTGRAY);
@@ -190,9 +210,10 @@ void drawCube() {
   DrawText("Current scramble:",
            GetScreenWidth() / 2 - MeasureText("Current scramble:", 30) / 2, 10,
            30, BLACK);
-  DrawText(currentScramble,
-           GetScreenWidth() / 2 - MeasureText(currentScramble, 20) / 2, 50, 20,
-           BLACK);
+  DrawTextBoxed(currentScramble, 20, 50);
+  // DrawText(currentScramble,
+  //          GetScreenWidth() / 2 - MeasureText(currentScramble, 20) / 2, 50,
+  //          20, BLACK);
 }
 
 int main(int argc, char **argv) {
@@ -204,7 +225,6 @@ int main(int argc, char **argv) {
   SetTargetFPS(40);
 
   cube = Cube_make(0.9f);
-  printf("oki \n");
 
   if (argc >= 2) {
     for (int i = 1; i < argc; i++)
