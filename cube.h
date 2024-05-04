@@ -44,7 +44,7 @@ void Cube_drawCube(Cube *cube);
 
 Rotation getCorrespondingRotation(char c);
 
-void Cube_applyMoves(Cube *cube, char *moves);
+void Cube_applyMove(Cube *cube, char *move);
 
 void Cube_rotate(Cube *cube, Rotation rotation, int numberOfLayers);
 

@@ -102,7 +102,7 @@ char getRotation(const char *move, size_t len) {
     return move[len - 1];
 }
 
-void Cube_applyMoves(Cube *cube, char *move) {
+void Cube_applyMove(Cube *cube, char *move) {
   size_t len = strlen(move);
   int nbOfLayers;
   if (move[1] == 'w')

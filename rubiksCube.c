@@ -98,14 +98,16 @@ void handleKeyPress() {
     generateScramble(scramble, SIZE);
 
     for (int i = 0; i < SCRAMBLE_SIZE; i++) {
-      Cube_applyMoves(&cube, scramble[i]);
+      Cube_applyMove(&cube, scramble[i]);
       if (scramble[i][0] == '1' && scramble[i][1] == 'w')
         strcat(currentScramble, scramble[i] + 2);
       else
         strcat(currentScramble, scramble[i]);
       free(scramble[i]);
-      strcat(currentScramble, " ");
+      if (i != SCRAMBLE_SIZE - 1)
+        strcat(currentScramble, " ");
     }
+    printf("%s\n", currentScramble);
   }
 }
 
@@ -204,9 +206,9 @@ int main(int argc, char **argv) {
   cube = Cube_make(0.9f);
   printf("oki \n");
 
-  if (argc == 2) {
-    char *moves = argv[1];
-    Cube_applyMoves(&cube, moves);
+  if (argc >= 2) {
+    for (int i = 1; i < argc; i++)
+      Cube_applyMove(&cube, argv[i]);
   }
 
   while (!WindowShouldClose()) {
