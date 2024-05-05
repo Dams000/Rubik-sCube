@@ -1,6 +1,8 @@
 #include "timer.h"
+#include <pthread.h>
 #include <stdbool.h>
 #include <time.h>
+#include <unistd.h>
 
 Timer Timer_make() {
   return (Timer){.minutes = 0,
@@ -10,9 +12,20 @@ Timer Timer_make() {
                  .isRunning = false};
 }
 
+void *threadFunction(void *arg) {
+  Timer *timer = (Timer *)arg;
+
+  while (timer->isRunning) {
+    Timer_update(timer);
+    usleep(10000);
+  }
+  return NULL;
+}
+
 void Timer_start(Timer *timer) {
   clock_gettime(CLOCK_MONOTONIC, &timer->startTime);
   timer->isRunning = true;
+  pthread_create(&timer->thread, NULL, threadFunction, (void *)timer);
 }
 
 void Timer_update(Timer *timer) {
@@ -31,4 +44,7 @@ void Timer_update(Timer *timer) {
   timer->milliseconds = (int)elapsed_time_ms % 1000;
 }
 
-void Timer_stop(Timer *timer) { timer->isRunning = false; }
+void Timer_stop(Timer *timer) {
+  timer->isRunning = false;
+  pthread_join(timer->thread, NULL);
+}
