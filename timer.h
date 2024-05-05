@@ -2,13 +2,13 @@
 #define TIMER_H
 
 #include <pthread.h>
-#include <time.h>
 #include <stdbool.h>
+#include <time.h>
 
 typedef struct Timer {
   int minutes, seconds, milliseconds;
   struct timespec startTime;
-  bool isRunning;
+  bool isRunning, justStopped;
   pthread_t thread;
 } Timer;
 

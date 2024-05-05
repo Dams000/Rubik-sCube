@@ -32,8 +32,10 @@ char *mouseRight =
     "Press right mouse button to reset the cube to its original, solved state.";
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
 char *mouseLeft = "Hold left mouse button down to move the camera around.";
+char *spaceBar = "Press the space bar to start (or stop) the timer";
 
 Timer timer;
+Color timerColor = BLACK;
 char timmerString[10] = "00:00.000";
 
 void handleKeyPress() {
@@ -113,11 +115,19 @@ void handleKeyPress() {
       if (i != SCRAMBLE_SIZE - 1)
         strcat(currentScramble, " ");
     }
-  } else if (IsKeyReleased(KEY_SPACE)) {
-    if (!timer.isRunning)
-      Timer_start(&timer);
+  } else if (IsKeyDown(KEY_SPACE)) {
+    if (!timer.isRunning && !timer.justStopped)
+      timerColor = (Color){0, 204, 51, 255};
     else
       Timer_stop(&timer);
+  } else if (IsKeyReleased(KEY_SPACE)) {
+    if (timer.justStopped) {
+      timer.justStopped = false;
+      return;
+    }
+    timerColor = BLACK;
+    if (!timer.isRunning)
+      Timer_start(&timer);
   }
 }
 
@@ -180,6 +190,9 @@ void drawHelpScreen() {
   DrawText(mouseLeft,
            GetScreenWidth() / 2 - MeasureText(mouseLeft, fontSize) / 2,
            GetScreenHeight() / 2 + 100, fontSize, BLACK);
+  DrawText(spaceBar,
+           GetScreenWidth() / 2 - MeasureText(spaceBar, fontSize) / 2,
+           GetScreenHeight() / 2 + 150, fontSize, BLACK);
 }
 
 void DrawTextBoxed(const char *text, float fontSize, int y) {
@@ -223,7 +236,7 @@ void drawCube() {
   snprintf(timmerString, 10, "%02d:%02d.%03d", timer.minutes, timer.seconds,
            timer.milliseconds);
   DrawText(timmerString, GetScreenWidth() / 2 - MeasureText("00:00.00", 40) / 2,
-           GetScreenHeight() - 50, 40, BLACK);
+           GetScreenHeight() - 50, 40, timerColor);
   DrawTextBoxed(currentScramble, 20, 50);
 }
 

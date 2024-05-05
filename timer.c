@@ -9,7 +9,8 @@ Timer Timer_make() {
                  .seconds = 0,
                  .milliseconds = 0,
                  .startTime = {0},
-                 .isRunning = false};
+                 .isRunning = false,
+                 .justStopped = false};
 }
 
 void *threadFunction(void *arg) {
@@ -46,5 +47,6 @@ void Timer_update(Timer *timer) {
 
 void Timer_stop(Timer *timer) {
   timer->isRunning = false;
+  timer->justStopped = true;
   pthread_join(timer->thread, NULL);
 }
