@@ -1,10 +1,12 @@
 #include "cube.h"
 #include "include/raylib.h"
 #include "scramble.h"
+#include "timer.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define CUBIE_SIZE 0.9
 
@@ -30,6 +32,9 @@ char *mouseRight =
     "Press right mouse button to reset the cube to its original, solved state.";
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
 char *mouseLeft = "Hold left mouse button down to move the camera around.";
+
+Timer timer;
+char timmerString[10] = "00:00.000";
 
 void handleKeyPress() {
   if (IsKeyPressed(KEY_U)) {
@@ -108,7 +113,11 @@ void handleKeyPress() {
       if (i != SCRAMBLE_SIZE - 1)
         strcat(currentScramble, " ");
     }
-    printf("%s\n", currentScramble);
+  } else if (IsKeyReleased(KEY_SPACE)) {
+    if (!timer.isRunning)
+      Timer_start(&timer);
+    else
+      Timer_stop(&timer);
   }
 }
 
@@ -210,6 +219,11 @@ void drawCube() {
   DrawText("Current scramble:",
            GetScreenWidth() / 2 - MeasureText("Current scramble:", 30) / 2, 10,
            30, BLACK);
+  Timer_update(&timer);
+  snprintf(timmerString, 10, "%02d:%02d.%03d", timer.minutes, timer.seconds,
+           timer.milliseconds);
+  DrawText(timmerString, GetScreenWidth() / 2 - MeasureText("00:00.00", 40) / 2,
+           GetScreenHeight() - 50, 40, BLACK);
   DrawTextBoxed(currentScramble, 20, 50);
 }
 
@@ -222,11 +236,11 @@ int main(int argc, char **argv) {
   SetTargetFPS(40);
 
   cube = Cube_make(CUBIE_SIZE);
+  timer = Timer_make();
 
-  if (argc >= 2) {
+  if (argc >= 2)
     for (int i = 1; i < argc; i++)
       Cube_applyMove(&cube, argv[i]);
-  }
 
   while (!WindowShouldClose()) {
     if (IsKeyPressed(KEY_H))
