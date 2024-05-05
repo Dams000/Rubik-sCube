@@ -1,6 +1,9 @@
 # RubiksCube
 
 Sources:
+- https://www.raylib.com/examples.html
+- https://www.raylib.com/cheatsheet/cheatsheet.html
+
 - https://en.wikipedia.org/wiki/Spherical_coordinate_system
 - https://ruwix.com/the-rubiks-cube/notation/
 - https://www.javatpoint.com/rotate-matrix-by-90-degrees-in-java
