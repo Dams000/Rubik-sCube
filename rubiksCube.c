@@ -150,7 +150,6 @@ void handleMouseMovementAndUpdateCamera() {
 }
 
 void drawHelpScreen() {
-
   int fontSize =
       fmax(fmin(floor((float)(GetScreenWidth() - 100) / 400) * 10, 40), 18);
 
@@ -175,7 +174,8 @@ void drawHelpScreen() {
 }
 
 void DrawTextBoxed(const char *text, float fontSize, int y) {
-  if (strlen(text) == 0) return;
+  if (strlen(text) == 0)
+    return;
   int lastSpace = 0;
   char *dup = strdup(text);
   char *lastSpacePtr = strrchr(dup, ' ');
@@ -211,9 +211,6 @@ void drawCube() {
            GetScreenWidth() / 2 - MeasureText("Current scramble:", 30) / 2, 10,
            30, BLACK);
   DrawTextBoxed(currentScramble, 20, 50);
-  // DrawText(currentScramble,
-  //          GetScreenWidth() / 2 - MeasureText(currentScramble, 20) / 2, 50,
-  //          20, BLACK);
 }
 
 int main(int argc, char **argv) {
@@ -224,7 +221,7 @@ int main(int argc, char **argv) {
   SetWindowMinSize(800, 600);
   SetTargetFPS(40);
 
-  cube = Cube_make(0.9f);
+  cube = Cube_make(CUBIE_SIZE);
 
   if (argc >= 2) {
     for (int i = 1; i < argc; i++)
