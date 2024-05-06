@@ -190,14 +190,14 @@ void drawHelpScreen() {
   DrawText(mouseLeft,
            GetScreenWidth() / 2 - MeasureText(mouseLeft, fontSize) / 2,
            GetScreenHeight() / 2 + 100, fontSize, BLACK);
-  DrawText(spaceBar,
-           GetScreenWidth() / 2 - MeasureText(spaceBar, fontSize) / 2,
+  DrawText(spaceBar, GetScreenWidth() / 2 - MeasureText(spaceBar, fontSize) / 2,
            GetScreenHeight() / 2 + 150, fontSize, BLACK);
 }
 
 void DrawTextBoxed(const char *text, float fontSize, int y) {
   if (strlen(text) == 0)
     return;
+
   int lastSpace = 0;
   char *dup = strdup(text);
   char *lastSpacePtr = strrchr(dup, ' ');
@@ -211,7 +211,8 @@ void DrawTextBoxed(const char *text, float fontSize, int y) {
   }
   DrawText(dup, GetScreenWidth() / 2 - MeasureText(dup, fontSize) / 2, y,
            fontSize, BLACK);
-  DrawTextBoxed(text + strlen(dup) + 1, fontSize, y + 30);
+  if (strlen(text) > strlen(dup))
+    DrawTextBoxed(text + strlen(dup) + 1, fontSize, y + 30);
   free(dup);
 }
 
