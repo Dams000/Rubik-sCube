@@ -18,8 +18,8 @@ float camera_phi = PI / 3;
 Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
-char *scramble[SCRAMBLE_SIZE];
-char currentScramble[6 * SCRAMBLE_SIZE + 1];
+char **scramble;
+char *currentScramble;
 
 bool showHelp = false;
 
@@ -38,67 +38,38 @@ Timer timer;
 Color timerColor = BLACK;
 char timmerString[10] = "00:00.000";
 
+void handleRotation(Rotation clockwise, Rotation antiClockwise) {
+  if (IsKeyPressed(KEY_LEFT_ALT))
+    Cube_rotate(&cube, antiClockwise, 1);
+  else 
+    Cube_rotate(&cube, clockwise, 1);
+}
+
 void handleKeyPress() {
   if (IsKeyPressed(KEY_U)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, u, 1);
-    else
-      Cube_rotate(&cube, U, 1);
+    handleRotation(U, u);
   } else if (IsKeyPressed(KEY_D)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, d, 1);
-    else
-      Cube_rotate(&cube, D, 1);
+    handleRotation(D, d);
   } else if (IsKeyPressed(KEY_L)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, l, 1);
-    else
-      Cube_rotate(&cube, L, 1);
+    handleRotation(L, l);
   } else if (IsKeyPressed(KEY_R)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, r, 1);
-    else
-      Cube_rotate(&cube, R, 1);
+    handleRotation(R, r);
   } else if (IsKeyPressed(KEY_F)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, f, 1);
-    else
-      Cube_rotate(&cube, F, 1);
+    handleRotation(F, f);
   } else if (IsKeyPressed(KEY_B)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, b, 1);
-    else
-      Cube_rotate(&cube, B, 1);
+    handleRotation(B, b);
   } else if (IsKeyPressed(KEY_M)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, m, 1);
-    else
-      Cube_rotate(&cube, M, 1);
+    handleRotation(M, m);
   } else if (IsKeyPressed(KEY_E)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, e, 1);
-    else
-      Cube_rotate(&cube, E, 1);
+    handleRotation(E, e);
   } else if (IsKeyPressed(KEY_S)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, s, 1);
-    else
-      Cube_rotate(&cube, S, 1);
+    handleRotation(S, s);
   } else if (IsKeyPressed(KEY_X)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, x, 1);
-    else
-      Cube_rotate(&cube, X, 1);
+    handleRotation(X, x);
   } else if (IsKeyPressed(KEY_Y)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, y, 1);
-    else
-      Cube_rotate(&cube, Y, 1);
+    handleRotation(Y, y);
   } else if (IsKeyPressed(KEY_Z)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, z, 1);
-    else
-      Cube_rotate(&cube, Z, 1);
+    handleRotation(Z, z);
   } else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
     Cube_free(cube);
@@ -252,6 +223,10 @@ int main(int argc, char **argv) {
   cube = Cube_make(CUBIE_SIZE);
   timer = Timer_make();
 
+  scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
+  currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
+  currentScramble[0] = '\0';
+
   if (argc >= 2)
     for (int i = 1; i < argc; i++)
       Cube_applyMove(&cube, argv[i]);
@@ -275,6 +250,8 @@ int main(int argc, char **argv) {
     EndDrawing();
   }
 
+  free(currentScramble);
+  free(scramble);
   Cube_free(cube);
 
   CloseWindow();
