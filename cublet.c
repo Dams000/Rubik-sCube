@@ -1,7 +1,7 @@
 #include "cublet.h"
+#include "include/raylib.h"
 #include "include/rlgl.h"
-
-enum faces { UP, FRONT, RIGHT, BACK, LEFT, DOWN } face;
+#include "utils.h"
 
 Cubie Cubie_make(int x, int y, int z, float sideLength, int size) {
   return (Cubie){.position = (Vector3){.x = x, .y = y, .z = z},
@@ -175,4 +175,20 @@ void Cubie_drawCubie(Cubie *cubie, Vector3 position) {
 
   rlEnd();
   rlPopMatrix();
+}
+
+char Cubie_getColor(Cubie *cubie, face face) {
+  if (colorsEqual(cubie->colors[face], WHITE))
+    return 'W';
+  else if (colorsEqual(cubie->colors[face], GREEN))
+    return 'G';
+  else if (colorsEqual(cubie->colors[face], RED))
+    return 'R';
+  else if (colorsEqual(cubie->colors[face], BLUE))
+    return 'B';
+  else if (colorsEqual(cubie->colors[face], ORANGE))
+    return 'O';
+  else if (colorsEqual(cubie->colors[face], YELLOW))
+    return 'Y';
+  return 'X';
 }

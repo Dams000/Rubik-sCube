@@ -4,6 +4,8 @@
 #include "include/raylib.h"
 #include "include/raymath.h"
 
+typedef enum faces { UP, FRONT, RIGHT, BACK, LEFT, DOWN } face;
+
 typedef struct Cubie {
   Vector3 position;
   Color colors[6];
@@ -25,5 +27,7 @@ void Cubie_rotateClockWise(Cubie *cubie);
 void Cubie_rotateAntiClockWise(Cubie *cubie);
 
 void Cubie_drawCubie(Cubie *cubie, Vector3 position);
+
+char Cubie_getColor(Cubie *cubie, face face);
 
 #endif // !CUBLET_H
