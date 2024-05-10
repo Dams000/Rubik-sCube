@@ -2,6 +2,7 @@
 #include "include/raylib.h"
 #include "scramble.h"
 #include "timer.h"
+#include "utils.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +42,7 @@ char timmerString[10] = "00:00.000";
 void handleRotation(Rotation clockwise, Rotation antiClockwise) {
   if (IsKeyPressed(KEY_LEFT_ALT))
     Cube_rotate(&cube, antiClockwise, 1);
-  else 
+  else
     Cube_rotate(&cube, clockwise, 1);
 }
 
@@ -86,6 +87,10 @@ void handleKeyPress() {
       if (i != SCRAMBLE_SIZE - 1)
         strcat(currentScramble, " ");
     }
+    char cubeStr[55];
+    Cube_toString(&cube, cubeStr);
+    cubeStr[54] = '\0';
+    printf("%s\n", cubeStr);
   } else if (IsKeyDown(KEY_SPACE)) {
     if (!timer.isRunning && !timer.justStopped)
       timerColor = (Color){0, 204, 51, 255};
