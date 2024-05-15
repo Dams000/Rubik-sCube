@@ -1,11 +1,11 @@
 #ifndef ENUM_H
 #define ENUM_H
 
-typedef enum Colors { U, R, F, D, L, B } Colors;
+#include "../cublet.h"
 
 typedef enum Corner { URF, UFL, ULB, UBR, DFR, DLF, DBL, DRB } Corner;
 
-typedef enum Direction { LEFT = -1, NONE, RIGHT, HALF } Direction;
+typedef enum Direction { NONE, CW, HALF, ANTICW } Direction;
 
 typedef enum Edge { UR, UF, UL, UB, DR, DF, DL, DB, FR, FL, BL, BR} Edge;
 
@@ -40,5 +40,7 @@ typedef enum Facelet {
     L1, L2, L3, L4, L5, L6, L7, L8, L9,
     B1, B2, B3, B4, B5, B6, B7, B8, B9
 } Facelet;
+
+Face getCorrespondingColor(char color);
 
 #endif // !ENUM_H

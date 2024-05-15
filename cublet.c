@@ -177,7 +177,7 @@ void Cubie_drawCubie(Cubie *cubie, Vector3 position) {
   rlPopMatrix();
 }
 
-char Cubie_getColor(Cubie *cubie, face face) {
+char Cubie_getColor(Cubie *cubie, Face face) {
   if (colorsEqual(cubie->colors[face], WHITE))
     return 'W';
   else if (colorsEqual(cubie->colors[face], GREEN))

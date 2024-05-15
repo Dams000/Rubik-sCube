@@ -1,8 +1,10 @@
 #include "cube.h"
 #include "include/raylib.h"
+#include "kociemba/coordCube.h"
+#include "kociemba/enums.h"
+#include "kociemba/twoPhase.h"
 #include "scramble.h"
 #include "timer.h"
-#include "utils.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,31 +49,31 @@ void handleRotation(Rotation clockwise, Rotation antiClockwise) {
 }
 
 void handleKeyPress() {
-  if (IsKeyPressed(KEY_U)) {
+  if (IsKeyPressed(KEY_U))
     handleRotation(U, u);
-  } else if (IsKeyPressed(KEY_D)) {
+  else if (IsKeyPressed(KEY_D))
     handleRotation(D, d);
-  } else if (IsKeyPressed(KEY_L)) {
+  else if (IsKeyPressed(KEY_L))
     handleRotation(L, l);
-  } else if (IsKeyPressed(KEY_R)) {
+  else if (IsKeyPressed(KEY_R))
     handleRotation(R, r);
-  } else if (IsKeyPressed(KEY_F)) {
+  else if (IsKeyPressed(KEY_F))
     handleRotation(F, f);
-  } else if (IsKeyPressed(KEY_B)) {
+  else if (IsKeyPressed(KEY_B))
     handleRotation(B, b);
-  } else if (IsKeyPressed(KEY_M)) {
+  else if (IsKeyPressed(KEY_M))
     handleRotation(M, m);
-  } else if (IsKeyPressed(KEY_E)) {
+  else if (IsKeyPressed(KEY_E))
     handleRotation(E, e);
-  } else if (IsKeyPressed(KEY_S)) {
+  else if (IsKeyPressed(KEY_S))
     handleRotation(S, s);
-  } else if (IsKeyPressed(KEY_X)) {
+  else if (IsKeyPressed(KEY_X))
     handleRotation(X, x);
-  } else if (IsKeyPressed(KEY_Y)) {
+  else if (IsKeyPressed(KEY_Y))
     handleRotation(Y, y);
-  } else if (IsKeyPressed(KEY_Z)) {
+  else if (IsKeyPressed(KEY_Z))
     handleRotation(Z, z);
-  } else if (IsKeyPressed(KEY_ENTER)) {
+  else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
@@ -87,10 +89,39 @@ void handleKeyPress() {
       if (i != SCRAMBLE_SIZE - 1)
         strcat(currentScramble, " ");
     }
-    char cubeStr[55];
-    Cube_toString(&cube, cubeStr);
-    cubeStr[54] = '\0';
-    printf("%s\n", cubeStr);
+    if (SIZE == 3) {
+      char cubeStr[55];
+      Cube_toString(&cube, cubeStr);
+      cubeStr[54] = '\0';
+      printf("%s\n", cubeStr);
+      Move moves[25];
+      printf("%d\n", findSolutionBasic(cubeStr, 25, 2000, moves));
+      for (int i = 0; i < 25; i++) {
+        Move cur = moves[i];
+        char face;
+        if (cur.orientation == 0)
+          face = 'U';
+        else if (cur.orientation == 1)
+          face = 'R';
+        else if (cur.orientation == 2)
+          face = 'F';
+        else if (cur.orientation == 3)
+          face = 'D';
+        else if (cur.orientation == 4)
+          face = 'L';
+        else if (cur.orientation == 5)
+          face = 'B';
+        else
+          break;
+        if (cur.direction == ANTICW)
+          printf("%c' ", face);
+        else if (cur.direction == HALF)
+          printf("%c2 ", face);
+        else
+          printf("%c ", face);
+      }
+      printf("\n");
+    }
   } else if (IsKeyDown(KEY_SPACE)) {
     if (!timer.isRunning && !timer.justStopped)
       timerColor = (Color){0, 204, 51, 255};
@@ -224,6 +255,9 @@ int main(int argc, char **argv) {
   InitWindow(1200, 800, "Rubik's Cube");
   SetWindowMinSize(800, 600);
   SetTargetFPS(40);
+
+  init();
+  printf("init()\n");
 
   cube = Cube_make(CUBIE_SIZE);
   timer = Timer_make();

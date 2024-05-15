@@ -334,97 +334,97 @@ char *Cube_toString(Cube *cube, char cubeStr[55]) {
   for (int z = 0; z < SIZE; z++)
     for (int x = 0; x < SIZE; x++) {
       if (colorsEqual(cube->cube[x][SIZE - 1][z].colors[UP], WHITE))
-        cubeStr[index] = 'W';
+        cubeStr[index] = 'U';
       else if (colorsEqual(cube->cube[x][SIZE - 1][z].colors[UP], GREEN))
-        cubeStr[index] = 'G';
+        cubeStr[index] = 'F';
       else if (colorsEqual(cube->cube[x][SIZE - 1][z].colors[UP], RED))
         cubeStr[index] = 'R';
       else if (colorsEqual(cube->cube[x][SIZE - 1][z].colors[UP], BLUE))
         cubeStr[index] = 'B';
       else if (colorsEqual(cube->cube[x][SIZE - 1][z].colors[UP], ORANGE))
-        cubeStr[index] = 'O';
+        cubeStr[index] = 'L';
       else if (colorsEqual(cube->cube[x][SIZE - 1][z].colors[UP], YELLOW))
-        cubeStr[index] = 'Y';
+        cubeStr[index] = 'D';
       index++;
     }
   for (int x = SIZE - 1; x >= 0; x--)
     for (int z = SIZE - 1; z >= 0; z--) {
       if (colorsEqual(cube->cube[SIZE - 1][x][z].colors[RIGHT], WHITE))
-        cubeStr[index] = 'W';
+        cubeStr[index] = 'U';
       else if (colorsEqual(cube->cube[SIZE - 1][x][z].colors[RIGHT], GREEN))
-        cubeStr[index] = 'G';
+        cubeStr[index] = 'F';
       else if (colorsEqual(cube->cube[SIZE - 1][x][z].colors[RIGHT], RED))
         cubeStr[index] = 'R';
       else if (colorsEqual(cube->cube[SIZE - 1][x][z].colors[RIGHT], BLUE))
         cubeStr[index] = 'B';
       else if (colorsEqual(cube->cube[SIZE - 1][x][z].colors[RIGHT], ORANGE))
-        cubeStr[index] = 'O';
+        cubeStr[index] = 'L';
       else if (colorsEqual(cube->cube[SIZE - 1][x][z].colors[RIGHT], YELLOW))
-        cubeStr[index] = 'Y';
+        cubeStr[index] = 'D';
       index++;
     }
   for (int z = SIZE - 1; z >= 0; z--)
     for (int x = 0; x < SIZE; x++) {
       if (colorsEqual(cube->cube[x][z][SIZE - 1].colors[FRONT], WHITE))
-        cubeStr[index] = 'W';
+        cubeStr[index] = 'U';
       else if (colorsEqual(cube->cube[x][z][SIZE - 1].colors[FRONT], GREEN))
-        cubeStr[index] = 'G';
+        cubeStr[index] = 'F';
       else if (colorsEqual(cube->cube[x][z][SIZE - 1].colors[FRONT], RED))
         cubeStr[index] = 'R';
       else if (colorsEqual(cube->cube[x][z][SIZE - 1].colors[FRONT], BLUE))
         cubeStr[index] = 'B';
       else if (colorsEqual(cube->cube[x][z][SIZE - 1].colors[FRONT], ORANGE))
-        cubeStr[index] = 'O';
+        cubeStr[index] = 'L';
       else if (colorsEqual(cube->cube[x][z][SIZE - 1].colors[FRONT], YELLOW))
-        cubeStr[index] = 'Y';
+        cubeStr[index] = 'D';
       index++;
     }
   for (int z = SIZE - 1; z >= 0; z--)
     for (int x = 0; x < SIZE; x++) {
       if (colorsEqual(cube->cube[x][0][z].colors[DOWN], WHITE))
-        cubeStr[index] = 'W';
+        cubeStr[index] = 'U';
       else if (colorsEqual(cube->cube[x][0][z].colors[DOWN], GREEN))
-        cubeStr[index] = 'G';
+        cubeStr[index] = 'F';
       else if (colorsEqual(cube->cube[x][0][z].colors[DOWN], RED))
         cubeStr[index] = 'R';
       else if (colorsEqual(cube->cube[x][0][z].colors[DOWN], BLUE))
         cubeStr[index] = 'B';
       else if (colorsEqual(cube->cube[x][0][z].colors[DOWN], ORANGE))
-        cubeStr[index] = 'O';
+        cubeStr[index] = 'L';
       else if (colorsEqual(cube->cube[x][0][z].colors[DOWN], YELLOW))
-        cubeStr[index] = 'Y';
+        cubeStr[index] = 'D';
       index++;
     }
   for (int x = SIZE - 1; x >= 0; x--)
     for (int z = 0; z < SIZE; z++) {
       if (colorsEqual(cube->cube[0][x][z].colors[LEFT], WHITE))
-        cubeStr[index] = 'W';
+        cubeStr[index] = 'U';
       else if (colorsEqual(cube->cube[0][x][z].colors[LEFT], GREEN))
-        cubeStr[index] = 'G';
+        cubeStr[index] = 'F';
       else if (colorsEqual(cube->cube[0][x][z].colors[LEFT], RED))
         cubeStr[index] = 'R';
       else if (colorsEqual(cube->cube[0][x][z].colors[LEFT], BLUE))
         cubeStr[index] = 'B';
       else if (colorsEqual(cube->cube[0][x][z].colors[LEFT], ORANGE))
-        cubeStr[index] = 'O';
+        cubeStr[index] = 'L';
       else if (colorsEqual(cube->cube[0][x][z].colors[LEFT], YELLOW))
-        cubeStr[index] = 'Y';
+        cubeStr[index] = 'D';
       index++;
     }
   for (int z = SIZE - 1; z >= 0; z--)
     for (int x = SIZE - 1; x >= 0; x--) {
       if (colorsEqual(cube->cube[x][z][0].colors[BACK], WHITE))
-        cubeStr[index] = 'W';
+        cubeStr[index] = 'U';
       else if (colorsEqual(cube->cube[x][z][0].colors[BACK], GREEN))
-        cubeStr[index] = 'G';
+        cubeStr[index] = 'F';
       else if (colorsEqual(cube->cube[x][z][0].colors[BACK], RED))
         cubeStr[index] = 'R';
       else if (colorsEqual(cube->cube[x][z][0].colors[BACK], BLUE))
         cubeStr[index] = 'B';
       else if (colorsEqual(cube->cube[x][z][0].colors[BACK], ORANGE))
-        cubeStr[index] = 'O';
+        cubeStr[index] = 'L';
       else if (colorsEqual(cube->cube[x][z][0].colors[BACK], YELLOW))
-        cubeStr[index] = 'Y';
+        cubeStr[index] = 'D';
       index++;
     }
   cubeStr[index] = '\0';
