@@ -15,6 +15,7 @@ Sources:
 - https://en.cppreference.com/w/c/experimental/dynamic/strdup
 - https://www.speedsolving.com/wiki/index.php/Scrambling
 
+- https://github.com/hkociemba/CubeExplorer
 
 ## Current functionalities:
 - Cube visualization in 3D (in any NxNxN size):
