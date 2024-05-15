@@ -5,11 +5,9 @@
 #include "kociemba/twoPhase.h"
 #include "scramble.h"
 #include "timer.h"
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #define CUBIE_SIZE 0.9
 
@@ -22,7 +20,7 @@ Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
 char **scramble;
-char *currentScramble;
+char *currentScramble, currentSolution[76];
 
 bool showHelp = false;
 
@@ -42,10 +40,61 @@ Color timerColor = BLACK;
 char timmerString[10] = "00:00.000";
 
 void handleRotation(Rotation clockwise, Rotation antiClockwise) {
-  if (IsKeyPressed(KEY_LEFT_ALT))
+  if (IsKeyDown(KEY_LEFT_ALT))
     Cube_rotate(&cube, antiClockwise, 1);
   else
     Cube_rotate(&cube, clockwise, 1);
+}
+
+void applyMovesAndUpdateCurrentScramble() {
+  for (int i = 0; i < SCRAMBLE_SIZE; i++) {
+    Cube_applyMove(&cube, scramble[i]);
+    if (scramble[i][0] == '1' && scramble[i][1] == 'w')
+      strcat(currentScramble, scramble[i] + 2);
+    else
+      strcat(currentScramble, scramble[i]);
+    free(scramble[i]);
+    if (i != SCRAMBLE_SIZE - 1)
+      strcat(currentScramble, " ");
+  }
+}
+
+void findSolutionAndUpdateCurrentSolution() {
+  if (SIZE != 3)
+    return;
+  char cubeStr[55];
+  Cube_toString(&cube, cubeStr);
+  Move moves[25];
+  int error = findSolutionBasic(cubeStr, 25, 2000, moves);
+  if (error != 0)
+    printErrorMessage(error);
+  int idx = 0;
+  for (int i = 0; i < 25; i++) {
+    Move cur = moves[i];
+    if (cur.orientation == 0)
+      currentSolution[idx++] = 'U';
+    else if (cur.orientation == 1)
+      currentSolution[idx++] = 'R';
+    else if (cur.orientation == 2)
+      currentSolution[idx++] = 'F';
+    else if (cur.orientation == 3)
+      currentSolution[idx++] = 'D';
+    else if (cur.orientation == 4)
+      currentSolution[idx++] = 'L';
+    else if (cur.orientation == 5)
+      currentSolution[idx++] = 'B';
+    else
+      break;
+    if (cur.direction == ANTICW)
+      currentSolution[idx++] = '\'';
+    else if (cur.direction == HALF)
+      currentSolution[idx++] = '2';
+    else
+      currentSolution[idx++] = ' ';
+    if (i != 24)
+      currentSolution[idx++] = ' ';
+  }
+  currentSolution[idx] = '\0';
 }
 
 void handleKeyPress() {
@@ -75,53 +124,13 @@ void handleKeyPress() {
     handleRotation(Z, z);
   else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
+    currentSolution[0] = '\0';
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     generateScramble(scramble, SIZE);
 
-    for (int i = 0; i < SCRAMBLE_SIZE; i++) {
-      Cube_applyMove(&cube, scramble[i]);
-      if (scramble[i][0] == '1' && scramble[i][1] == 'w')
-        strcat(currentScramble, scramble[i] + 2);
-      else
-        strcat(currentScramble, scramble[i]);
-      free(scramble[i]);
-      if (i != SCRAMBLE_SIZE - 1)
-        strcat(currentScramble, " ");
-    }
-    if (SIZE == 3) {
-      char cubeStr[55];
-      Cube_toString(&cube, cubeStr);
-      cubeStr[54] = '\0';
-      printf("%s\n", cubeStr);
-      Move moves[25];
-      printf("%d\n", findSolutionBasic(cubeStr, 25, 2000, moves));
-      for (int i = 0; i < 25; i++) {
-        Move cur = moves[i];
-        char face;
-        if (cur.orientation == 0)
-          face = 'U';
-        else if (cur.orientation == 1)
-          face = 'R';
-        else if (cur.orientation == 2)
-          face = 'F';
-        else if (cur.orientation == 3)
-          face = 'D';
-        else if (cur.orientation == 4)
-          face = 'L';
-        else if (cur.orientation == 5)
-          face = 'B';
-        else
-          break;
-        if (cur.direction == ANTICW)
-          printf("%c' ", face);
-        else if (cur.direction == HALF)
-          printf("%c2 ", face);
-        else
-          printf("%c ", face);
-      }
-      printf("\n");
-    }
+    applyMovesAndUpdateCurrentScramble();
+    findSolutionAndUpdateCurrentSolution();
   } else if (IsKeyDown(KEY_SPACE)) {
     if (!timer.isRunning && !timer.justStopped)
       timerColor = (Color){0, 204, 51, 255};
@@ -143,6 +152,7 @@ void handleMouseMovementAndUpdateCamera() {
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     currentScramble[0] = '\0';
+    currentSolution[0] = '\0';
   } else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
     camera_mag = 2 * SIZE;
     camera_mag_vel = 0.0f;
@@ -246,6 +256,7 @@ void drawCube() {
   DrawText(timmerString, GetScreenWidth() / 2 - MeasureText("00:00.00", 40) / 2,
            GetScreenHeight() - 50, 40, timerColor);
   DrawTextBoxed(currentScramble, 20, 50);
+  DrawTextBoxed(currentSolution, 20, GetScreenHeight() - 100);
 }
 
 int main(int argc, char **argv) {
@@ -257,7 +268,6 @@ int main(int argc, char **argv) {
   SetTargetFPS(40);
 
   init();
-  printf("init()\n");
 
   cube = Cube_make(CUBIE_SIZE);
   timer = Timer_make();
@@ -265,6 +275,7 @@ int main(int argc, char **argv) {
   scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
   currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
   currentScramble[0] = '\0';
+  currentSolution[0] = '\0';
 
   if (argc >= 2)
     for (int i = 1; i < argc; i++)
@@ -280,12 +291,10 @@ int main(int argc, char **argv) {
     }
 
     BeginDrawing();
-
     if (showHelp)
       drawHelpScreen();
     else
       drawCube();
-
     EndDrawing();
   }
 

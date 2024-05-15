@@ -1,5 +1,4 @@
 #include "faceCube.h"
-#include "enums.h"
 #include <assert.h>
 #include <string.h>
 

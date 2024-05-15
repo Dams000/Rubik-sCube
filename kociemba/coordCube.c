@@ -33,7 +33,7 @@ CoordCube CoordCube_make(CubieCube cubieCube) {
 
 void init() {
   initialize_moveCube();
-  printf("initialize_moveCube();\n");
+  printf("\ninitialize_moveCube();\n");
   initTwistMove();
   printf("initTwistMove();\n");
   initFlipMove();
@@ -57,7 +57,7 @@ void init() {
   initSlice_Twist_Prun();
   printf("initSlice_Twist_Prun();\n");
   initSlice_Flip_Prun();
-  printf("initSlice_Flip_Prun();\n");
+  printf("initSlice_Flip_Prun();\n\n");
 }
 
 // *****************Phase 1 move tables****************************

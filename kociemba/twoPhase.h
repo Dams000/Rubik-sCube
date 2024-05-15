@@ -4,6 +4,8 @@
 #include "cubieCube.h"
 #include "move.h"
 
+void printErrorMessage(int error);
+
 /**
  * Finds list of moves for solving received cube with no more than @maxDepth
  * moves.

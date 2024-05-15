@@ -1,7 +1,5 @@
 #include "cubieCube.h"
 #include "../utils.h"
-#include "enums.h"
-#include <stdio.h>
 
 const Corner cornerPermutationU[] = {UBR, URF, UFL, ULB, DFR, DLF, DBL, DRB};
 const char cornerOrientationU[] = {0, 0, 0, 0, 0, 0, 0, 0};

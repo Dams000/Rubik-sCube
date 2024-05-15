@@ -1,10 +1,7 @@
 #include "twoPhase.h"
 #include "coordCube.h"
-#include "cubieCube.h"
 #include "enums.h"
 #include "faceCube.h"
-#include "move.h"
-#include <time.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -40,6 +37,38 @@ char *SOLVED_CUBE = "UUUUUUUUU"
                     "DDDDDDDDD"
                     "LLLLLLLLL"
                     "BBBBBBBBB";
+
+void printErrorMessage(int error) {
+  if (error == -1)
+    printf("There are not exactly 9 facelets of each color");
+  if (error == -2)
+    printf("Not all 12 edges exist exactly once");
+  if (error == -3)
+    printf("Flip error: One edge has to be flipped");
+  if (error == -4)
+    printf("Not all corners exist exactly once");
+  if (error == -5)
+    printf("Twist error: One corner has to be twisted");
+  if (error == -6)
+    printf("Parity error: Two corners or two edges have to be exchanged");
+  if (error == -7)
+    printf("No solution exists for the given maxDepth");
+  if (error == -8)
+    printf("Timeout, no solution within given time");
+  if (error == 1)
+    printf("There are not exactly 9 facelets of each color in pattern");
+  if (error == 2)
+    printf("Not all 12 edges exist exactly once in pattern");
+  if (error == 3)
+    printf("Flip error: One edge has to be flipped in pattern");
+  if (error == 4)
+    printf("Not all corners exist exactly once in pattern");
+  if (error == 5)
+    printf("Twist error: One corner has to be twisted in pattern");
+  if (error == 6)
+    printf("Parity error: Two corners or two edges have to be exchanged in "
+           "pattern");
+}
 
 int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
                  char *pattern) {
