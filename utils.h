@@ -13,4 +13,6 @@ bool colorsEqual(Color color1, Color color2);
 
 int Cnk(int n, int k);
 
+void storeTime(char *time, int size);
+
 #endif // !UTILS_H

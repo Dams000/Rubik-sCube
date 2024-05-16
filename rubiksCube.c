@@ -38,11 +38,11 @@ char *mouseRight =
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
 char *mouseLeft = "Hold left mouse button down to move the camera around.";
 char *spaceBar = "Press the space bar to start (or stop) the timer";
-char *cubeSize ="Press '-' to reduce the cube size and '+' to increase it.";
+char *cubeSize = "Press '-' to reduce the cube size and '+' to increase it.";
 
 Timer timer;
 Color timerColor = BLACK;
-char timmerString[10] = "00:00.000";
+char timerString[10] = "00:00.000";
 
 void handleRotation(Rotation clockwise, Rotation antiClockwise) {
   if (IsKeyDown(KEY_LEFT_ALT))
@@ -67,6 +67,10 @@ void applyMovesAndUpdateCurrentScramble() {
 void findSolutionAndUpdateCurrentSolution() {
   if (SIZE != 3)
     return;
+
+  struct timespec start, now;
+  clock_gettime(CLOCK_MONOTONIC, &start);
+
   currentSolutionSize = 0;
   char cubeStr[55];
   Cube_toString(&cube, cubeStr);
@@ -102,6 +106,13 @@ void findSolutionAndUpdateCurrentSolution() {
   currentSolution[idx] = '\0';
   snprintf(solutionFoundText, 30,
            "Solution found in %d moves:", currentSolutionSize);
+
+  clock_gettime(CLOCK_MONOTONIC, &now);
+
+  long long elapsed_time_ns = (now.tv_sec - start.tv_sec) * 1000000000LL +
+                              (now.tv_nsec - start.tv_nsec);
+  double elapsed_time_ms = (double)elapsed_time_ns / 1000000.0;
+  printf("Solution found in %f milliseconds\n", elapsed_time_ms);
 }
 
 void handleKeyPress() {
@@ -143,10 +154,12 @@ void handleKeyPress() {
   } else if (IsKeyDown(KEY_SPACE)) {
     if (!timer.isRunning && !timer.justStopped)
       timerColor = (Color){0, 204, 51, 255};
-    else
+    else {
       Timer_stop(&timer);
+    }
   } else if (IsKeyReleased(KEY_SPACE)) {
     if (timer.justStopped) {
+      storeTime(timerString, SIZE);
       timer.justStopped = false;
       return;
     }
@@ -154,11 +167,11 @@ void handleKeyPress() {
     if (!timer.isRunning)
       Timer_start(&timer);
   } else if (IsKeyPressed(KEY_KP_ADD)) {
+    free(currentScramble);
+    free(scramble);
     Cube_free(cube);
     SIZE += (SIZE == 11) ? 0 : 1;
     cube = Cube_make(CUBIE_SIZE);
-    free(currentScramble);
-    free(scramble);
     scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
     currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
     currentScramble[0] = '\0';
@@ -287,9 +300,9 @@ void drawCube() {
            GetScreenWidth() / 2 - MeasureText("Current scramble:", 30) / 2, 10,
            30, BLACK);
   Timer_update(&timer);
-  snprintf(timmerString, 10, "%02d:%02d.%03d", timer.minutes, timer.seconds,
+  snprintf(timerString, 10, "%02d:%02d.%03d", timer.minutes, timer.seconds,
            timer.milliseconds);
-  DrawText(timmerString, GetScreenWidth() / 2 - MeasureText("00:00.00", 40) / 2,
+  DrawText(timerString, GetScreenWidth() / 2 - MeasureText("00:00.00", 40) / 2,
            GetScreenHeight() - 50, 40, timerColor);
   DrawTextBoxed(currentScramble, 20, 50);
   if (currentSolutionSize != 0)
