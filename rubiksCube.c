@@ -25,7 +25,8 @@ Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
 char **scramble;
-char *currentScramble, currentSolution[76];
+char *currentScramble, currentSolution[76], solutionFoundText[30];
+int currentSolutionSize;
 
 bool showHelp = false;
 
@@ -34,6 +35,8 @@ char *rotateFace =
     "Press the corresponding key to move each face (Hold alt down for "
     "prime moves):";
 char *facesKey = "R (right), L (left), U (up), D (down), F (front), B (back).";
+char *solveKey =
+    "Press 'K' to find an optimal solution to the cube (only 3x3x3).";
 char *mouseRight =
     "Press right mouse button to reset the cube to its original, solved state.";
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
@@ -67,6 +70,7 @@ void applyMovesAndUpdateCurrentScramble() {
 void findSolutionAndUpdateCurrentSolution() {
   if (SIZE != 3)
     return;
+  currentSolutionSize = 0;
   char cubeStr[55];
   Cube_toString(&cube, cubeStr);
   Move moves[25];
@@ -96,8 +100,11 @@ void findSolutionAndUpdateCurrentSolution() {
       currentSolution[idx++] = '2';
     if (i != 24)
       currentSolution[idx++] = ' ';
+    currentSolutionSize++;
   }
   currentSolution[idx] = '\0';
+  snprintf(solutionFoundText, 30,
+           "Solution found in %d moves:", currentSolutionSize);
 }
 
 void handleKeyPress() {
@@ -128,6 +135,7 @@ void handleKeyPress() {
   else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
     currentSolution[0] = '\0';
+    currentSolutionSize = 0;
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     generateScramble(scramble, SIZE);
@@ -157,6 +165,7 @@ void handleMouseMovementAndUpdateCamera() {
     cube = Cube_make(CUBIE_SIZE);
     currentScramble[0] = '\0';
     currentSolution[0] = '\0';
+    currentSolutionSize = 0;
   } else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
     camera_mag = 2 * SIZE;
     camera_mag_vel = 0.0f;
@@ -196,11 +205,13 @@ void drawHelpScreen() {
   ClearBackground(LIGHTGRAY);
   DrawText("Press 'h' to exit.", 10, 10, 20, DARKGRAY);
   DrawText(enter, GetScreenWidth() / 2 - MeasureText(enter, fontSize) / 2,
-           GetScreenHeight() / 2 - 150, fontSize, BLACK);
+           GetScreenHeight() / 2 - 200, fontSize, BLACK);
   DrawText(rotateFace,
            GetScreenWidth() / 2 - MeasureText(rotateFace, fontSize) / 2,
-           GetScreenHeight() / 2 - 100, fontSize, BLACK);
+           GetScreenHeight() / 2 - 150, fontSize, BLACK);
   DrawText(facesKey, GetScreenWidth() / 2 - MeasureText(facesKey, fontSize) / 2,
+           GetScreenHeight() / 2 - 100, fontSize, BLACK);
+  DrawText(solveKey, GetScreenWidth() / 2 - MeasureText(solveKey, fontSize) / 2,
            GetScreenHeight() / 2 - 50, fontSize, BLACK);
   DrawText(mouseRight,
            GetScreenWidth() / 2 - MeasureText(mouseRight, fontSize) / 2,
@@ -260,6 +271,10 @@ void drawCube() {
   DrawText(timmerString, GetScreenWidth() / 2 - MeasureText("00:00.00", 40) / 2,
            GetScreenHeight() - 50, 40, timerColor);
   DrawTextBoxed(currentScramble, 20, 50);
+  if (currentSolutionSize != 0)
+    DrawText(solutionFoundText,
+             GetScreenWidth() / 2 - MeasureText(solutionFoundText, 20) / 2,
+             GetScreenHeight() - 130, 20, BLACK);
   DrawTextBoxed(currentSolution, 20, GetScreenHeight() - 100);
 }
 
@@ -280,6 +295,7 @@ int main(int argc, char **argv) {
   currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
   currentScramble[0] = '\0';
   currentSolution[0] = '\0';
+  currentSolutionSize = 0;
 
   if (argc >= 2)
     for (int i = 1; i < argc; i++)

@@ -24,6 +24,7 @@ Sources:
 - Scramble generations:
   - Works with every cube size.
 - Timer.
+- Kociemba's algorithm (usually finds a solution in 20-22 moves).
 
 ## Usage
 Run the following commands to compile and run the project:
