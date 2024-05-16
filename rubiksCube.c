@@ -1,14 +1,20 @@
 #include "cube.h"
 #include "include/raylib.h"
+#include "kociemba/coordCube.h"
+#include "kociemba/enums.h"
+#include "kociemba/twoPhase.h"
 #include "scramble.h"
 #include "timer.h"
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #define CUBIE_SIZE 0.9
+#define KEY_M_FR 59
+#define KEY_A_FR 81
+#define KEY_Q_FR 65
+#define KEY_Z_FR 87
+#define KEY_W_FR 90
 
 float camera_mag = 2 * SIZE;
 float camera_mag_vel = 0.0f;
@@ -18,8 +24,9 @@ float camera_phi = PI / 3;
 Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
-char *scramble[SCRAMBLE_SIZE];
-char currentScramble[6 * SCRAMBLE_SIZE + 1];
+char **scramble;
+char *currentScramble, currentSolution[76], solutionFoundText[30];
+int currentSolutionSize;
 
 bool showHelp = false;
 
@@ -28,6 +35,8 @@ char *rotateFace =
     "Press the corresponding key to move each face (Hold alt down for "
     "prime moves):";
 char *facesKey = "R (right), L (left), U (up), D (down), F (front), B (back).";
+char *solveKey =
+    "Press 'K' to find an optimal solution to the cube (only 3x3x3).";
 char *mouseRight =
     "Press right mouse button to reset the cube to its original, solved state.";
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
@@ -38,83 +47,102 @@ Timer timer;
 Color timerColor = BLACK;
 char timmerString[10] = "00:00.000";
 
+void handleRotation(Rotation clockwise, Rotation antiClockwise) {
+  if (IsKeyDown(KEY_LEFT_ALT))
+    Cube_rotate(&cube, antiClockwise, 1);
+  else
+    Cube_rotate(&cube, clockwise, 1);
+}
+
+void applyMovesAndUpdateCurrentScramble() {
+  for (int i = 0; i < SCRAMBLE_SIZE; i++) {
+    Cube_applyMove(&cube, scramble[i]);
+    if (scramble[i][0] == '1' && scramble[i][1] == 'w')
+      strcat(currentScramble, scramble[i] + 2);
+    else
+      strcat(currentScramble, scramble[i]);
+    free(scramble[i]);
+    if (i != SCRAMBLE_SIZE - 1)
+      strcat(currentScramble, " ");
+  }
+}
+
+void findSolutionAndUpdateCurrentSolution() {
+  if (SIZE != 3)
+    return;
+  currentSolutionSize = 0;
+  char cubeStr[55];
+  Cube_toString(&cube, cubeStr);
+  Move moves[25];
+  int error = findSolutionBasic(cubeStr, 25, 20000, moves);
+  if (error != 0)
+    printErrorMessage(error);
+  int idx = 0;
+  for (int i = 0; i < 25; i++) {
+    Move cur = moves[i];
+    if (cur.orientation == 0)
+      currentSolution[idx++] = 'U';
+    else if (cur.orientation == 1)
+      currentSolution[idx++] = 'R';
+    else if (cur.orientation == 2)
+      currentSolution[idx++] = 'F';
+    else if (cur.orientation == 3)
+      currentSolution[idx++] = 'D';
+    else if (cur.orientation == 4)
+      currentSolution[idx++] = 'L';
+    else if (cur.orientation == 5)
+      currentSolution[idx++] = 'B';
+    else
+      break;
+    if (cur.direction == ANTICW)
+      currentSolution[idx++] = '\'';
+    else if (cur.direction == HALF)
+      currentSolution[idx++] = '2';
+    if (i != 24)
+      currentSolution[idx++] = ' ';
+    currentSolutionSize++;
+  }
+  currentSolution[idx] = '\0';
+  snprintf(solutionFoundText, 30,
+           "Solution found in %d moves:", currentSolutionSize);
+}
+
 void handleKeyPress() {
-  if (IsKeyPressed(KEY_U)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, u, 1);
-    else
-      Cube_rotate(&cube, U, 1);
-  } else if (IsKeyPressed(KEY_D)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, d, 1);
-    else
-      Cube_rotate(&cube, D, 1);
-  } else if (IsKeyPressed(KEY_L)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, l, 1);
-    else
-      Cube_rotate(&cube, L, 1);
-  } else if (IsKeyPressed(KEY_R)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, r, 1);
-    else
-      Cube_rotate(&cube, R, 1);
-  } else if (IsKeyPressed(KEY_F)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, f, 1);
-    else
-      Cube_rotate(&cube, F, 1);
-  } else if (IsKeyPressed(KEY_B)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, b, 1);
-    else
-      Cube_rotate(&cube, B, 1);
-  } else if (IsKeyPressed(KEY_M)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, m, 1);
-    else
-      Cube_rotate(&cube, M, 1);
-  } else if (IsKeyPressed(KEY_E)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, e, 1);
-    else
-      Cube_rotate(&cube, E, 1);
-  } else if (IsKeyPressed(KEY_S)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, s, 1);
-    else
-      Cube_rotate(&cube, S, 1);
-  } else if (IsKeyPressed(KEY_X)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, x, 1);
-    else
-      Cube_rotate(&cube, X, 1);
-  } else if (IsKeyPressed(KEY_Y)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, y, 1);
-    else
-      Cube_rotate(&cube, Y, 1);
-  } else if (IsKeyPressed(KEY_Z)) {
-    if (IsKeyDown(KEY_LEFT_ALT))
-      Cube_rotate(&cube, z, 1);
-    else
-      Cube_rotate(&cube, Z, 1);
-  } else if (IsKeyPressed(KEY_ENTER)) {
+  if (IsKeyPressed(KEY_U))
+    handleRotation(U, u);
+  else if (IsKeyPressed(KEY_D))
+    handleRotation(D, d);
+  else if (IsKeyPressed(KEY_L))
+    handleRotation(L, l);
+  else if (IsKeyPressed(KEY_R))
+    handleRotation(R, r);
+  else if (IsKeyPressed(KEY_F))
+    handleRotation(F, f);
+  else if (IsKeyPressed(KEY_B))
+    handleRotation(B, b);
+  else if (IsKeyPressed(KEY_M_FR))
+    handleRotation(M, m);
+  else if (IsKeyPressed(KEY_E))
+    handleRotation(E, e);
+  else if (IsKeyPressed(KEY_S))
+    handleRotation(S, s);
+  else if (IsKeyPressed(KEY_X))
+    handleRotation(X, x);
+  else if (IsKeyPressed(KEY_Y))
+    handleRotation(Y, y);
+  else if (IsKeyPressed(KEY_Z_FR))
+    handleRotation(Z, z);
+  else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
+    currentSolution[0] = '\0';
+    currentSolutionSize = 0;
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     generateScramble(scramble, SIZE);
 
-    for (int i = 0; i < SCRAMBLE_SIZE; i++) {
-      Cube_applyMove(&cube, scramble[i]);
-      if (scramble[i][0] == '1' && scramble[i][1] == 'w')
-        strcat(currentScramble, scramble[i] + 2);
-      else
-        strcat(currentScramble, scramble[i]);
-      free(scramble[i]);
-      if (i != SCRAMBLE_SIZE - 1)
-        strcat(currentScramble, " ");
-    }
+    applyMovesAndUpdateCurrentScramble();
+  } else if (IsKeyPressed(KEY_K)) {
+    findSolutionAndUpdateCurrentSolution();
   } else if (IsKeyDown(KEY_SPACE)) {
     if (!timer.isRunning && !timer.justStopped)
       timerColor = (Color){0, 204, 51, 255};
@@ -136,6 +164,8 @@ void handleMouseMovementAndUpdateCamera() {
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     currentScramble[0] = '\0';
+    currentSolution[0] = '\0';
+    currentSolutionSize = 0;
   } else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
     camera_mag = 2 * SIZE;
     camera_mag_vel = 0.0f;
@@ -175,11 +205,13 @@ void drawHelpScreen() {
   ClearBackground(LIGHTGRAY);
   DrawText("Press 'h' to exit.", 10, 10, 20, DARKGRAY);
   DrawText(enter, GetScreenWidth() / 2 - MeasureText(enter, fontSize) / 2,
-           GetScreenHeight() / 2 - 150, fontSize, BLACK);
+           GetScreenHeight() / 2 - 200, fontSize, BLACK);
   DrawText(rotateFace,
            GetScreenWidth() / 2 - MeasureText(rotateFace, fontSize) / 2,
-           GetScreenHeight() / 2 - 100, fontSize, BLACK);
+           GetScreenHeight() / 2 - 150, fontSize, BLACK);
   DrawText(facesKey, GetScreenWidth() / 2 - MeasureText(facesKey, fontSize) / 2,
+           GetScreenHeight() / 2 - 100, fontSize, BLACK);
+  DrawText(solveKey, GetScreenWidth() / 2 - MeasureText(solveKey, fontSize) / 2,
            GetScreenHeight() / 2 - 50, fontSize, BLACK);
   DrawText(mouseRight,
            GetScreenWidth() / 2 - MeasureText(mouseRight, fontSize) / 2,
@@ -190,14 +222,14 @@ void drawHelpScreen() {
   DrawText(mouseLeft,
            GetScreenWidth() / 2 - MeasureText(mouseLeft, fontSize) / 2,
            GetScreenHeight() / 2 + 100, fontSize, BLACK);
-  DrawText(spaceBar,
-           GetScreenWidth() / 2 - MeasureText(spaceBar, fontSize) / 2,
+  DrawText(spaceBar, GetScreenWidth() / 2 - MeasureText(spaceBar, fontSize) / 2,
            GetScreenHeight() / 2 + 150, fontSize, BLACK);
 }
 
 void DrawTextBoxed(const char *text, float fontSize, int y) {
   if (strlen(text) == 0)
     return;
+
   int lastSpace = 0;
   char *dup = strdup(text);
   char *lastSpacePtr = strrchr(dup, ' ');
@@ -211,7 +243,8 @@ void DrawTextBoxed(const char *text, float fontSize, int y) {
   }
   DrawText(dup, GetScreenWidth() / 2 - MeasureText(dup, fontSize) / 2, y,
            fontSize, BLACK);
-  DrawTextBoxed(text + strlen(dup) + 1, fontSize, y + 30);
+  if (strlen(text) > strlen(dup))
+    DrawTextBoxed(text + strlen(dup) + 1, fontSize, y + 30);
   free(dup);
 }
 
@@ -238,6 +271,11 @@ void drawCube() {
   DrawText(timmerString, GetScreenWidth() / 2 - MeasureText("00:00.00", 40) / 2,
            GetScreenHeight() - 50, 40, timerColor);
   DrawTextBoxed(currentScramble, 20, 50);
+  if (currentSolutionSize != 0)
+    DrawText(solutionFoundText,
+             GetScreenWidth() / 2 - MeasureText(solutionFoundText, 20) / 2,
+             GetScreenHeight() - 130, 20, BLACK);
+  DrawTextBoxed(currentSolution, 20, GetScreenHeight() - 100);
 }
 
 int main(int argc, char **argv) {
@@ -248,8 +286,16 @@ int main(int argc, char **argv) {
   SetWindowMinSize(800, 600);
   SetTargetFPS(40);
 
+  init();
+
   cube = Cube_make(CUBIE_SIZE);
   timer = Timer_make();
+
+  scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
+  currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
+  currentScramble[0] = '\0';
+  currentSolution[0] = '\0';
+  currentSolutionSize = 0;
 
   if (argc >= 2)
     for (int i = 1; i < argc; i++)
@@ -265,15 +311,15 @@ int main(int argc, char **argv) {
     }
 
     BeginDrawing();
-
     if (showHelp)
       drawHelpScreen();
     else
       drawCube();
-
     EndDrawing();
   }
 
+  free(currentScramble);
+  free(scramble);
   Cube_free(cube);
 
   CloseWindow();

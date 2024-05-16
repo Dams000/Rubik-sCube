@@ -15,6 +15,7 @@ Sources:
 - https://en.cppreference.com/w/c/experimental/dynamic/strdup
 - https://www.speedsolving.com/wiki/index.php/Scrambling
 
+- https://github.com/hkociemba/CubeExplorer
 
 ## Current functionalities:
 - Cube visualization in 3D (in any NxNxN size):
@@ -23,6 +24,7 @@ Sources:
 - Scramble generations:
   - Works with every cube size.
 - Timer.
+- Kociemba's algorithm (usually finds a solution in 20-22 moves).
 
 ## Usage
 Run the following commands to compile and run the project:
