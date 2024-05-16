@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int SIZE = 3;
+
 bool isInnerCubie(float x, float y, float z) {
   return x != 0 && y != 0 && z != 0 && x != SIZE - 1 && y != SIZE - 1 &&
          z != SIZE - 1;

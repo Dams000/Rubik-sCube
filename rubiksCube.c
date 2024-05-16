@@ -5,21 +5,17 @@
 #include "kociemba/twoPhase.h"
 #include "scramble.h"
 #include "timer.h"
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define CUBIE_SIZE 0.9
-#define KEY_M_FR 59
-#define KEY_A_FR 81
-#define KEY_Q_FR 65
-#define KEY_Z_FR 87
-#define KEY_W_FR 90
 
-float camera_mag = 2 * SIZE;
-float camera_mag_vel = 0.0f;
-float camera_theta = PI / 5;
-float camera_phi = PI / 3;
+float camera_mag;
+float camera_mag_vel;
+float camera_theta;
+float camera_phi;
 
 Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
@@ -42,6 +38,7 @@ char *mouseRight =
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
 char *mouseLeft = "Hold left mouse button down to move the camera around.";
 char *spaceBar = "Press the space bar to start (or stop) the timer";
+char *cubeSize ="Press '-' to reduce the cube size and '+' to increase it.";
 
 Timer timer;
 Color timerColor = BLACK;
@@ -156,6 +153,28 @@ void handleKeyPress() {
     timerColor = BLACK;
     if (!timer.isRunning)
       Timer_start(&timer);
+  } else if (IsKeyPressed(KEY_KP_ADD)) {
+    Cube_free(cube);
+    SIZE += (SIZE == 11) ? 0 : 1;
+    cube = Cube_make(CUBIE_SIZE);
+    free(currentScramble);
+    free(scramble);
+    scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
+    currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
+    currentScramble[0] = '\0';
+    currentSolution[0] = '\0';
+    currentSolutionSize = 0;
+  } else if (IsKeyPressed(KEY_KP_SUBTRACT)) {
+    Cube_free(cube);
+    SIZE -= (SIZE == 1) ? 0 : 1;
+    cube = Cube_make(CUBIE_SIZE);
+    free(currentScramble);
+    free(scramble);
+    scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
+    currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
+    currentScramble[0] = '\0';
+    currentSolution[0] = '\0';
+    currentSolutionSize = 0;
   }
 }
 
@@ -224,6 +243,8 @@ void drawHelpScreen() {
            GetScreenHeight() / 2 + 100, fontSize, BLACK);
   DrawText(spaceBar, GetScreenWidth() / 2 - MeasureText(spaceBar, fontSize) / 2,
            GetScreenHeight() / 2 + 150, fontSize, BLACK);
+  DrawText(cubeSize, GetScreenWidth() / 2 - MeasureText(cubeSize, fontSize) / 2,
+           GetScreenHeight() / 2 + 200, fontSize, BLACK);
 }
 
 void DrawTextBoxed(const char *text, float fontSize, int y) {
@@ -287,6 +308,11 @@ int main(int argc, char **argv) {
   SetTargetFPS(40);
 
   init();
+
+  camera_mag = 2 * SIZE;
+  camera_mag_vel = 0.0f;
+  camera_theta = PI / 5;
+  camera_phi = PI / 3;
 
   cube = Cube_make(CUBIE_SIZE);
   timer = Timer_make();
