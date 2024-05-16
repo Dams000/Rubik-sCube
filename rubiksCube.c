@@ -10,6 +10,11 @@
 #include <string.h>
 
 #define CUBIE_SIZE 0.9
+#define KEY_M_FR 59
+#define KEY_A_FR 81
+#define KEY_Q_FR 65
+#define KEY_Z_FR 87
+#define KEY_W_FR 90
 
 float camera_mag = 2 * SIZE;
 float camera_mag_vel = 0.0f;
@@ -65,7 +70,7 @@ void findSolutionAndUpdateCurrentSolution() {
   char cubeStr[55];
   Cube_toString(&cube, cubeStr);
   Move moves[25];
-  int error = findSolutionBasic(cubeStr, 25, 2000, moves);
+  int error = findSolutionBasic(cubeStr, 25, 20000, moves);
   if (error != 0)
     printErrorMessage(error);
   int idx = 0;
@@ -89,8 +94,6 @@ void findSolutionAndUpdateCurrentSolution() {
       currentSolution[idx++] = '\'';
     else if (cur.direction == HALF)
       currentSolution[idx++] = '2';
-    else
-      currentSolution[idx++] = ' ';
     if (i != 24)
       currentSolution[idx++] = ' ';
   }
@@ -110,7 +113,7 @@ void handleKeyPress() {
     handleRotation(F, f);
   else if (IsKeyPressed(KEY_B))
     handleRotation(B, b);
-  else if (IsKeyPressed(KEY_M))
+  else if (IsKeyPressed(KEY_M_FR))
     handleRotation(M, m);
   else if (IsKeyPressed(KEY_E))
     handleRotation(E, e);
@@ -120,7 +123,7 @@ void handleKeyPress() {
     handleRotation(X, x);
   else if (IsKeyPressed(KEY_Y))
     handleRotation(Y, y);
-  else if (IsKeyPressed(KEY_Z))
+  else if (IsKeyPressed(KEY_Z_FR))
     handleRotation(Z, z);
   else if (IsKeyPressed(KEY_ENTER)) {
     currentScramble[0] = '\0';
@@ -130,6 +133,7 @@ void handleKeyPress() {
     generateScramble(scramble, SIZE);
 
     applyMovesAndUpdateCurrentScramble();
+  } else if (IsKeyPressed(KEY_K)) {
     findSolutionAndUpdateCurrentSolution();
   } else if (IsKeyDown(KEY_SPACE)) {
     if (!timer.isRunning && !timer.justStopped)

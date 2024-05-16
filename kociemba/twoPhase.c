@@ -40,34 +40,34 @@ char *SOLVED_CUBE = "UUUUUUUUU"
 
 void printErrorMessage(int error) {
   if (error == -1)
-    printf("There are not exactly 9 facelets of each color");
+    printf("There are not exactly 9 facelets of each color\n");
   if (error == -2)
-    printf("Not all 12 edges exist exactly once");
+    printf("Not all 12 edges exist exactly once\n");
   if (error == -3)
-    printf("Flip error: One edge has to be flipped");
+    printf("Flip error: One edge has to be flipped\n");
   if (error == -4)
-    printf("Not all corners exist exactly once");
+    printf("Not all corners exist exactly once\n");
   if (error == -5)
-    printf("Twist error: One corner has to be twisted");
+    printf("Twist error: One corner has to be twisted\n");
   if (error == -6)
-    printf("Parity error: Two corners or two edges have to be exchanged");
+    printf("Parity error: Two corners or two edges have to be exchanged\n");
   if (error == -7)
-    printf("No solution exists for the given maxDepth");
+    printf("No solution exists for the given maxDepth\n");
   if (error == -8)
-    printf("Timeout, no solution within given time");
+    printf("Timeout, no solution within given time\n");
   if (error == 1)
-    printf("There are not exactly 9 facelets of each color in pattern");
+    printf("There are not exactly 9 facelets of each color in pattern\n");
   if (error == 2)
-    printf("Not all 12 edges exist exactly once in pattern");
+    printf("Not all 12 edges exist exactly once in pattern\n");
   if (error == 3)
-    printf("Flip error: One edge has to be flipped in pattern");
+    printf("Flip error: One edge has to be flipped in pattern\n");
   if (error == 4)
-    printf("Not all corners exist exactly once in pattern");
+    printf("Not all corners exist exactly once in pattern\n");
   if (error == 5)
-    printf("Twist error: One corner has to be twisted in pattern");
+    printf("Twist error: One corner has to be twisted in pattern\n");
   if (error == 6)
     printf("Parity error: Two corners or two edges have to be exchanged in "
-           "pattern");
+           "pattern\n");
 }
 
 int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
