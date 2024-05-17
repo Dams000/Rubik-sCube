@@ -7,7 +7,6 @@
 #include "scramble.h"
 #include "timer.h"
 #include "utils.h"
-#include <bits/pthreadtypes.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -326,6 +325,11 @@ void drawCube() {
              GetScreenWidth() / 2 - MeasureText(solutionFoundText, 20) / 2,
              GetScreenHeight() - 130, 20, BLACK);
   DrawTextBoxed(currentSolution, 20, GetScreenHeight() - 100);
+
+  char times[5][12];
+  getAverageOf5(times, SIZE);
+  for (int i = 0; i < 5; i++)
+    DrawText(times[i], 10, GetScreenHeight() / 2 + i * 30, 20, BLACK);
 }
 
 void drawLoadingScreen() {
@@ -378,8 +382,6 @@ int main(int argc, char **argv) {
   if (argc >= 2)
     for (int i = 1; i < argc; i++)
       Cube_applyMove(&cube, argv[i]);
-
-  getAverageOf5(SIZE);
 
   while (!WindowShouldClose()) {
     if (IsKeyPressed(KEY_H))
