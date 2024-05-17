@@ -45,7 +45,7 @@ void printErrorMessage(int error);
  *          6: Parity error: Two corners or two edges have to be exchanged in
  * pattern<br>*/
 int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
-                 char *pattern);
+                 char *pattern, int *depth);
 
 /**
  * Finds list of moves for solving received cube with no more than @maxDepth
@@ -76,7 +76,7 @@ int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
  *         -8: Timeout, no solution within given time
  */
 int findSolutionBasic(char *cube, int maxDepth, long timeOut,
-                      Move moves[maxDepth]);
+                      Move moves[maxDepth], int *depth);
 
 /**
  * Validates input cube string and returns a corresponding error code.

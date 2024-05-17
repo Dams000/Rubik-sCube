@@ -71,7 +71,7 @@ void printErrorMessage(int error) {
 }
 
 int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
-                 char *pattern) {
+                 char *pattern, int *depth) {
   CubieCube cubieCube = CubieCube_make();
   // validate cube
   int errorCode = validateCubeStringAndInitCubieCube(cube, &cubieCube);
@@ -225,6 +225,7 @@ int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
             (axis[depthPhase1 - 1] != axis[depthPhase1] &&
              axis[depthPhase1 - 1] != axis[depthPhase1] + 3)) {
           createMovesList(moves, depthTotal);
+          *depth = depthTotal;
           return 0;
         }
       }
@@ -233,8 +234,8 @@ int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
 }
 
 int findSolutionBasic(char *cube, int maxDepth, long timeOut,
-                      Move moves[maxDepth]) {
-  return findSolution(cube, maxDepth, timeOut, moves, SOLVED_CUBE);
+                      Move moves[maxDepth], int *depth) {
+  return findSolution(cube, maxDepth, timeOut, moves, SOLVED_CUBE, depth);
 }
 
 int validateCubeStringAndInitCubieCube(char *cube, CubieCube *cubieCube) {

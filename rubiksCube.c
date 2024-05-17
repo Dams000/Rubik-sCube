@@ -1,3 +1,4 @@
+#include "average.h"
 #include "cube.h"
 #include "include/raylib.h"
 #include "kociemba/coordCube.h"
@@ -79,7 +80,8 @@ void findSolutionAndUpdateCurrentSolution() {
   char cubeStr[55];
   Cube_toString(&cube, cubeStr);
   Move moves[25];
-  int error = findSolutionBasic(cubeStr, 25, 20000, moves);
+  int depth;
+  int error = findSolutionBasic(cubeStr, 25, 20000, moves, &depth);
   if (error != 0)
     printErrorMessage(error);
   int idx = 0;
@@ -106,6 +108,8 @@ void findSolutionAndUpdateCurrentSolution() {
     if (i != 24)
       currentSolution[idx++] = ' ';
     currentSolutionSize++;
+    if (currentSolutionSize == depth)
+      break;
   }
   currentSolution[idx] = '\0';
   snprintf(solutionFoundText, 30,
@@ -374,6 +378,8 @@ int main(int argc, char **argv) {
   if (argc >= 2)
     for (int i = 1; i < argc; i++)
       Cube_applyMove(&cube, argv[i]);
+
+  getAverageOf5(SIZE);
 
   while (!WindowShouldClose()) {
     if (IsKeyPressed(KEY_H))
