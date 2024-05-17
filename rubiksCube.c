@@ -6,6 +6,8 @@
 #include "scramble.h"
 #include "timer.h"
 #include "utils.h"
+#include <bits/pthreadtypes.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,7 +26,7 @@ char **scramble;
 char *currentScramble, currentSolution[76], solutionFoundText[30];
 int currentSolutionSize;
 
-bool showHelp = false;
+bool showHelp = false, isEverythingLoaded = false;
 
 char *enter = "Press 'Enter' to scramble the cube.";
 char *rotateFace =
@@ -65,8 +67,10 @@ void applyMovesAndUpdateCurrentScramble() {
 }
 
 void findSolutionAndUpdateCurrentSolution() {
-  if (SIZE != 3)
+  if (SIZE != 3) {
+    snprintf(currentSolution, 41, "The algorithm only works on 3x3x3 cubes.");
     return;
+  }
 
   struct timespec start, now;
   clock_gettime(CLOCK_MONOTONIC, &start);
@@ -312,14 +316,16 @@ void drawCube() {
   DrawTextBoxed(currentSolution, 20, GetScreenHeight() - 100);
 }
 
-int main(int argc, char **argv) {
-  SetTraceLogLevel(LOG_WARNING);
+void drawLoadingScreen() {
+  BeginDrawing();
+  ClearBackground(LIGHTGRAY);
+  DrawText("LOADING...",
+           GetScreenWidth() / 2 - MeasureText("LOADING...", 40) / 2,
+           GetScreenHeight() / 2 - 20, 40, BLACK);
+  EndDrawing();
+}
 
-  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-  InitWindow(1200, 800, "Rubik's Cube");
-  SetWindowMinSize(800, 600);
-  SetTargetFPS(40);
-
+void *initEverything() {
   init();
 
   camera_mag = 2 * SIZE;
@@ -335,6 +341,27 @@ int main(int argc, char **argv) {
   currentScramble[0] = '\0';
   currentSolution[0] = '\0';
   currentSolutionSize = 0;
+
+  isEverythingLoaded = true;
+
+  return NULL;
+}
+
+int main(int argc, char **argv) {
+  SetTraceLogLevel(LOG_WARNING);
+
+  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+  InitWindow(1200, 800, "Rubik's Cube");
+  SetWindowMinSize(800, 600);
+  SetTargetFPS(40);
+
+  pthread_t thread;
+  pthread_create(&thread, NULL, initEverything, NULL);
+
+  while (!isEverythingLoaded)
+    drawLoadingScreen();
+
+  pthread_join(thread, NULL);
 
   if (argc >= 2)
     for (int i = 1; i < argc; i++)
