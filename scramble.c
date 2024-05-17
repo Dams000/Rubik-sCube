@@ -5,6 +5,8 @@
 
 char *possibleMoves[] = {"R", "R'", "R2", "L", "L'", "L2", "U", "U'", "U2",
                          "D", "D'", "D2", "F", "F'", "F2", "B", "B'", "B2"};
+char *possibleMoves2x2x2[] = {"R",  "R'", "R2", "U", "U'",
+                              "U2", "F",  "F'", "F2"};
 
 bool areOppsitefaces(char c1, char c2) {
   return (c1 == 'R' && c2 == 'L') || (c1 == 'L' && c2 == 'R') ||
@@ -12,7 +14,8 @@ bool areOppsitefaces(char c1, char c2) {
          (c1 == 'F' && c2 == 'B') || (c1 == 'B' && c2 == 'F');
 }
 
-bool moveIsValid(const char *fullMove, const char *lastMove, char *sequence[SCRAMBLE_SIZE],
+bool moveIsValid(const char *fullMove, const char *lastMove,
+                 char *sequence[SCRAMBLE_SIZE],
                  unsigned short int sequenceLength) {
   if (strcmp(fullMove, lastMove) == 0 || fullMove[2] == lastMove[2])
     return false;
@@ -28,11 +31,14 @@ bool moveIsValid(const char *fullMove, const char *lastMove, char *sequence[SCRA
 char **generateScramble(char *sequence[SCRAMBLE_SIZE],
                         unsigned short int cubeSize) {
   unsigned short int sequenceLength = 0;
+  char **moves = (cubeSize == 2) ? possibleMoves2x2x2 : possibleMoves;
+  int possibleMovesSize = (cubeSize == 2) ? 9 : 18;
 
   while (sequenceLength < SCRAMBLE_SIZE) {
-    unsigned short int rand = GetRandomValue(0, 17);
-    unsigned short int n = (cubeSize == 1) ? 1 : GetRandomValue(1, cubeSize / 2);
-    const char *currentMove = possibleMoves[rand];
+    unsigned short int rand = GetRandomValue(0, possibleMovesSize - 1);
+    unsigned short int n =
+        (cubeSize == 1) ? 1 : GetRandomValue(1, cubeSize / 2);
+    const char *currentMove = moves[rand];
 
     const char layers[] = "%dw%s";
     unsigned short int size = snprintf(NULL, 0, layers, n, currentMove);
