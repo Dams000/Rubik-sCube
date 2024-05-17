@@ -181,6 +181,10 @@ void handleKeyPress() {
     currentScramble[0] = '\0';
     currentSolution[0] = '\0';
     currentSolutionSize = 0;
+    camera_mag = 2 * SIZE;
+    camera_mag_vel = 0.0f;
+    camera_theta = PI / 5;
+    camera_phi = PI / 3;
   } else if (IsKeyPressed(KEY_KP_SUBTRACT)) {
     Cube_free(cube);
     SIZE -= (SIZE == 1) ? 0 : 1;
@@ -192,6 +196,10 @@ void handleKeyPress() {
     currentScramble[0] = '\0';
     currentSolution[0] = '\0';
     currentSolutionSize = 0;
+    camera_mag = 2 * SIZE;
+    camera_mag_vel = 0.0f;
+    camera_theta = PI / 5;
+    camera_phi = PI / 3;
   }
 }
 
