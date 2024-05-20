@@ -7,7 +7,6 @@
 #include "scramble.h"
 #include "timer.h"
 #include "utils.h"
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,7 +22,8 @@ Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
 char **scramble;
-char *currentScramble, currentSolution[76], solutionFoundText[30];
+char *currentScramble, currentSolution[76], solutionFoundText[30], times[5][12],
+    avg[10];
 int currentSolutionSize;
 
 bool showHelp = false, isEverythingLoaded = false;
@@ -167,6 +167,8 @@ void handleKeyPress() {
   } else if (IsKeyReleased(KEY_SPACE)) {
     if (timer.justStopped) {
       storeTime(timerString, SIZE);
+      getTimes(times, SIZE);
+      getAverageOf5(times, avg);
       timer.justStopped = false;
       return;
     }
@@ -183,11 +185,13 @@ void handleKeyPress() {
     currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
     currentScramble[0] = '\0';
     currentSolution[0] = '\0';
+    avg[0] = '\0';
     currentSolutionSize = 0;
     camera_mag = 2 * SIZE;
     camera_mag_vel = 0.0f;
     camera_theta = PI / 5;
     camera_phi = PI / 3;
+    getTimes(times, SIZE);
   } else if (IsKeyPressed(KEY_KP_SUBTRACT)) {
     Cube_free(cube);
     SIZE -= (SIZE == 1) ? 0 : 1;
@@ -198,11 +202,13 @@ void handleKeyPress() {
     currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
     currentScramble[0] = '\0';
     currentSolution[0] = '\0';
+    avg[0] = '\0';
     currentSolutionSize = 0;
     camera_mag = 2 * SIZE;
     camera_mag_vel = 0.0f;
     camera_theta = PI / 5;
     camera_phi = PI / 3;
+    getTimes(times, SIZE);
   }
 }
 
@@ -326,18 +332,33 @@ void drawCube() {
              GetScreenHeight() - 130, 20, BLACK);
   DrawTextBoxed(currentSolution, 20, GetScreenHeight() - 100);
 
-  char times[5][12];
-  getAverageOf5(times, SIZE);
+  DrawText("Ao5:", 10, GetScreenHeight() / 2 - 100, 20, BLACK);
+  DrawText(avg, 20 + MeasureText("Ao5:", 20), GetScreenHeight() / 2 - 100, 20,
+           BLACK);
   for (int i = 0; i < 5; i++)
-    DrawText(times[i], 10, GetScreenHeight() / 2 + i * 30, 20, BLACK);
+    DrawText(times[i], 10, GetScreenHeight() / 2 + (i - 2) * 30, 20, BLACK);
 }
 
-void drawLoadingScreen() {
+void drawLoadingScreen(int frameCount) {
+  int x = frameCount % 40;
   BeginDrawing();
   ClearBackground(LIGHTGRAY);
-  DrawText("LOADING...",
-           GetScreenWidth() / 2 - MeasureText("LOADING...", 40) / 2,
-           GetScreenHeight() / 2 - 20, 40, BLACK);
+  if (0 <= x && x < 10)
+    DrawText("LOADING",
+             GetScreenWidth() / 2 - MeasureText("LOADING...", 40) / 2,
+             GetScreenHeight() / 2 - 20, 40, BLACK);
+  else if (10 <= x && x < 20)
+    DrawText("LOADING.",
+             GetScreenWidth() / 2 - MeasureText("LOADING...", 40) / 2,
+             GetScreenHeight() / 2 - 20, 40, BLACK);
+  else if (20 <= x && x < 30)
+    DrawText("LOADING..",
+             GetScreenWidth() / 2 - MeasureText("LOADING...", 40) / 2,
+             GetScreenHeight() / 2 - 20, 40, BLACK);
+  else
+    DrawText("LOADING...",
+             GetScreenWidth() / 2 - MeasureText("LOADING...", 40) / 2,
+             GetScreenHeight() / 2 - 20, 40, BLACK);
   EndDrawing();
 }
 
@@ -351,6 +372,7 @@ void *initEverything() {
 
   cube = Cube_make(CUBIE_SIZE);
   timer = Timer_make();
+  getTimes(times, SIZE);
 
   scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
   currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
@@ -359,6 +381,8 @@ void *initEverything() {
   currentSolutionSize = 0;
 
   isEverythingLoaded = true;
+
+  getAverageOf5(times, avg);
 
   return NULL;
 }
@@ -374,8 +398,11 @@ int main(int argc, char **argv) {
   pthread_t thread;
   pthread_create(&thread, NULL, initEverything, NULL);
 
-  while (!isEverythingLoaded)
-    drawLoadingScreen();
+  int frameCount = 0;
+  while (!isEverythingLoaded) {
+    drawLoadingScreen(frameCount);
+    frameCount++;
+  }
 
   pthread_join(thread, NULL);
 
