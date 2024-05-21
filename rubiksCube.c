@@ -66,6 +66,46 @@ void applyMovesAndUpdateCurrentScramble() {
   }
 }
 
+int findSolutionAndUpdateMoves(Cube *cube, int depthLimit, int timeOut) {
+  char cubeStr[55];
+  Cube_toString(cube, cubeStr);
+  Move moves[25];
+  int depth;
+  int error = findSolutionBasic(cubeStr, depthLimit, timeOut, moves, &depth);
+  if (error != 0) {
+    return error;
+  }
+
+  int currentMovesIndex = 0;
+  for (int i = 0; i < 25; i++) {
+    Move cur = moves[i];
+    if (cur.orientation == 0)
+      currentSolution[currentMovesIndex++] = 'U';
+    else if (cur.orientation == 1)
+      currentSolution[currentMovesIndex++] = 'R';
+    else if (cur.orientation == 2)
+      currentSolution[currentMovesIndex++] = 'F';
+    else if (cur.orientation == 3)
+      currentSolution[currentMovesIndex++] = 'D';
+    else if (cur.orientation == 4)
+      currentSolution[currentMovesIndex++] = 'L';
+    else if (cur.orientation == 5)
+      currentSolution[currentMovesIndex++] = 'B';
+    if (cur.direction == ANTICW)
+      currentSolution[currentMovesIndex++] = '\'';
+    else if (cur.direction == HALF)
+      currentSolution[currentMovesIndex++] = '2';
+    if (i != 24)
+      currentSolution[currentMovesIndex++] = ' ';
+    currentSolutionSize++;
+    if (currentSolutionSize == depth)
+      break;
+  }
+  currentSolution[currentMovesIndex] = '\0';
+
+  return 0;
+}
+
 void findSolutionAndUpdateCurrentSolution() {
   if (SIZE != 3) {
     snprintf(currentSolution, 41, "The algorithm only works on 3x3x3 cubes.");
@@ -76,41 +116,12 @@ void findSolutionAndUpdateCurrentSolution() {
   clock_gettime(CLOCK_MONOTONIC, &start);
 
   currentSolutionSize = 0;
-  char cubeStr[55];
-  Cube_toString(&cube, cubeStr);
-  Move moves[25];
-  int depth;
-  int error = findSolutionBasic(cubeStr, 25, 20000, moves, &depth);
-  if (error != 0)
-    printErrorMessage(error);
-  int idx = 0;
-  for (int i = 0; i < 25; i++) {
-    Move cur = moves[i];
-    if (cur.orientation == 0)
-      currentSolution[idx++] = 'U';
-    else if (cur.orientation == 1)
-      currentSolution[idx++] = 'R';
-    else if (cur.orientation == 2)
-      currentSolution[idx++] = 'F';
-    else if (cur.orientation == 3)
-      currentSolution[idx++] = 'D';
-    else if (cur.orientation == 4)
-      currentSolution[idx++] = 'L';
-    else if (cur.orientation == 5)
-      currentSolution[idx++] = 'B';
-    else
-      break;
-    if (cur.direction == ANTICW)
-      currentSolution[idx++] = '\'';
-    else if (cur.direction == HALF)
-      currentSolution[idx++] = '2';
-    if (i != 24)
-      currentSolution[idx++] = ' ';
-    currentSolutionSize++;
-    if (currentSolutionSize == depth)
-      break;
+  int error = findSolutionAndUpdateMoves(&cube, 22, 20000);
+  if (error != 0) {
+    snprintf(currentSolution, 75, "%s", printErrorMessage(error));
+    return;
   }
-  currentSolution[idx] = '\0';
+
   snprintf(solutionFoundText, 30,
            "Solution found in %d moves:", currentSolutionSize);
 
@@ -119,7 +130,50 @@ void findSolutionAndUpdateCurrentSolution() {
   long long elapsed_time_ns = (now.tv_sec - start.tv_sec) * 1000000000LL +
                               (now.tv_nsec - start.tv_nsec);
   double elapsed_time_ms = (double)elapsed_time_ns / 1000000.0;
-  printf("Solution found in %f milliseconds\n", elapsed_time_ms);
+  printf("Solution found in ~%f milliseconds\n", elapsed_time_ms);
+}
+
+void clearCurrentScrambleAndSolution() {
+  currentScramble[0] = '\0';
+  currentSolution[0] = '\0';
+  currentSolutionSize = 0;
+}
+
+void generateNewScramble() {
+  clearCurrentScrambleAndSolution();
+  Cube_free(cube);
+  cube = Cube_make(CUBIE_SIZE);
+  generateScramble(scramble, SIZE);
+  applyMovesAndUpdateCurrentScramble();
+}
+
+void initCameraSettings() {
+  camera_mag = 2 * SIZE;
+  camera_mag_vel = 0.0f;
+  camera_theta = PI / 5;
+  camera_phi = PI / 3;
+}
+
+void initCurrentScrambleAndSolution() {
+  cube = Cube_make(CUBIE_SIZE);
+  scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
+  currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
+  clearCurrentScrambleAndSolution();
+  avg[0] = '\0';
+}
+
+void resizeCube(int increment) {
+  free(currentScramble);
+  free(scramble);
+  Cube_free(cube);
+
+  SIZE += (SIZE == 11 || SIZE == 1) ? 0 : increment;
+
+  initCurrentScrambleAndSolution();
+
+  initCameraSettings();
+
+  getTimes(times, SIZE);
 }
 
 void handleKeyPress() {
@@ -147,18 +201,11 @@ void handleKeyPress() {
     handleRotation(Y, y);
   else if (IsKeyPressed(KEY_Z_FR))
     handleRotation(Z, z);
-  else if (IsKeyPressed(KEY_ENTER)) {
-    currentScramble[0] = '\0';
-    currentSolution[0] = '\0';
-    currentSolutionSize = 0;
-    Cube_free(cube);
-    cube = Cube_make(CUBIE_SIZE);
-    generateScramble(scramble, SIZE);
-
-    applyMovesAndUpdateCurrentScramble();
-  } else if (IsKeyPressed(KEY_K)) {
+  else if (IsKeyPressed(KEY_ENTER))
+    generateNewScramble();
+  else if (IsKeyPressed(KEY_K))
     findSolutionAndUpdateCurrentSolution();
-  } else if (IsKeyDown(KEY_SPACE)) {
+  else if (IsKeyDown(KEY_SPACE)) {
     if (!timer.isRunning && !timer.justStopped)
       timerColor = (Color){0, 204, 51, 255};
     else {
@@ -169,61 +216,26 @@ void handleKeyPress() {
       storeTime(timerString, SIZE);
       getTimes(times, SIZE);
       getAverageOf5(times, avg);
+      generateNewScramble();
       timer.justStopped = false;
       return;
     }
     timerColor = BLACK;
     if (!timer.isRunning)
       Timer_start(&timer);
-  } else if (IsKeyPressed(KEY_KP_ADD)) {
-    free(currentScramble);
-    free(scramble);
-    Cube_free(cube);
-    SIZE += (SIZE == 11) ? 0 : 1;
-    cube = Cube_make(CUBIE_SIZE);
-    scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
-    currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
-    currentScramble[0] = '\0';
-    currentSolution[0] = '\0';
-    avg[0] = '\0';
-    currentSolutionSize = 0;
-    camera_mag = 2 * SIZE;
-    camera_mag_vel = 0.0f;
-    camera_theta = PI / 5;
-    camera_phi = PI / 3;
-    getTimes(times, SIZE);
-  } else if (IsKeyPressed(KEY_KP_SUBTRACT)) {
-    Cube_free(cube);
-    SIZE -= (SIZE == 1) ? 0 : 1;
-    cube = Cube_make(CUBIE_SIZE);
-    free(currentScramble);
-    free(scramble);
-    scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
-    currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
-    currentScramble[0] = '\0';
-    currentSolution[0] = '\0';
-    avg[0] = '\0';
-    currentSolutionSize = 0;
-    camera_mag = 2 * SIZE;
-    camera_mag_vel = 0.0f;
-    camera_theta = PI / 5;
-    camera_phi = PI / 3;
-    getTimes(times, SIZE);
-  }
+  } else if (IsKeyPressed(KEY_KP_ADD))
+    resizeCube(1);
+  else if (IsKeyPressed(KEY_KP_SUBTRACT))
+    resizeCube(-1);
 }
 
 void handleMouseMovementAndUpdateCamera() {
   if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
-    currentScramble[0] = '\0';
-    currentSolution[0] = '\0';
-    currentSolutionSize = 0;
+    clearCurrentScrambleAndSolution();
   } else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
-    camera_mag = 2 * SIZE;
-    camera_mag_vel = 0.0f;
-    camera_theta = PI / 5;
-    camera_phi = PI / 3;
+    initCameraSettings();
   }
 
   float dt = GetFrameTime();
@@ -316,6 +328,7 @@ void drawCube() {
   Cube_drawCube(&cube);
 
   EndMode3D();
+
   DrawText("Press 'h' for help.", 10, 10, 20, DARKGRAY);
   DrawText("Current scramble:",
            GetScreenWidth() / 2 - MeasureText("Current scramble:", 30) / 2, 10,
@@ -365,20 +378,13 @@ void drawLoadingScreen(int frameCount) {
 void *initEverything() {
   init();
 
-  camera_mag = 2 * SIZE;
-  camera_mag_vel = 0.0f;
-  camera_theta = PI / 5;
-  camera_phi = PI / 3;
+  initCameraSettings();
 
   cube = Cube_make(CUBIE_SIZE);
   timer = Timer_make();
   getTimes(times, SIZE);
 
-  scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
-  currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
-  currentScramble[0] = '\0';
-  currentSolution[0] = '\0';
-  currentSolutionSize = 0;
+  initCurrentScrambleAndSolution();
 
   isEverythingLoaded = true;
 

@@ -11,6 +11,19 @@ int compare(const void *a, const void *b) {
   return strcmp(time1, time2);
 }
 
+int countLines(FILE *fp) {
+  int count = 0;
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
+
+  while ((read = getline(&line, &len, fp)) != -1)
+    count++;
+
+  rewind(fp);
+  return count;
+}
+
 void getTimes(char times[5][12], int cubeSize) {
   char filename[20];
   snprintf(filename, 20, "times/%d.time", cubeSize);
@@ -20,13 +33,10 @@ void getTimes(char times[5][12], int cubeSize) {
     exit(1);
   }
 
-  int count = 0;
+  int count = countLines(fp);
   char *line = NULL;
   size_t len = 0;
   ssize_t read;
-
-  while ((read = getline(&line, &len, fp)) != -1)
-    count++;
 
   char **sortedTimes = malloc(fmax(count, 5) * sizeof(char *));
   if (sortedTimes == NULL) {
@@ -117,11 +127,10 @@ void getAverageOf5(char times[5][12], char avg[10]) {
   int millisecondsTotal = 0;
   for (int i = 0; i < 3; i++) {
     millisecondsTotal += timeToMillis(validTimes[i]);
-    printf("%d\n", millisecondsTotal);
   }
   millisecondsTotal /= 3;
   int minutes = millisecondsTotal / (1000 * 60);
   int seconds = (millisecondsTotal / 1000) % 60;
   int milliseconds = millisecondsTotal % 1000;
-  snprintf(avg, 10, "%02d:%02d.%03d", minutes, seconds, milliseconds);
+  snprintf(avg, 17, "%02d:%02d.%03d", minutes, seconds, milliseconds);
 }
