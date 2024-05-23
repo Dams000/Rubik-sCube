@@ -14,6 +14,7 @@ bool isInnerCubie(float x, float y, float z) {
 }
 
 Cube Cube_make(float cubletSize) {
+  printf("cube make\n");
   Cube cube;
   cube.cube = (Cubie ***)malloc(SIZE * sizeof(Cubie **));
   for (unsigned short int x = 0; x < SIZE; x++) {
@@ -31,6 +32,7 @@ Cube Cube_make(float cubletSize) {
 }
 
 void Cube_free(Cube cube) {
+  printf("cube free\n");
   for (unsigned short int x = 0; x < SIZE; x++) {
     for (unsigned short int y = 0; y < SIZE; y++) {
       free(cube.cube[x][y]);

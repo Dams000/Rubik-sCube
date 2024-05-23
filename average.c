@@ -1,4 +1,5 @@
 #include "average.h"
+#include "utils.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -24,7 +25,7 @@ int countLines(FILE *fp) {
   return count;
 }
 
-void getTimes(char times[5][12], int cubeSize) {
+void getTimes(char times[5][20], int cubeSize) {
   char filename[20];
   snprintf(filename, 20, "times/%d.time", cubeSize);
   FILE *fp = fopen(filename, "a+");
@@ -65,7 +66,7 @@ void getTimes(char times[5][12], int cubeSize) {
       fclose(fp);
       exit(1);
     }
-    snprintf(times[x], 12, "%s", line);
+    snprintf(times[x], 20, "%s", line);
     strcpy(sortedTimes[x], line);
     x++;
   }
@@ -79,14 +80,16 @@ void getTimes(char times[5][12], int cubeSize) {
 
     bool found = false;
     for (int i = 0; i < x; i++)
-      if (!found && strcmp(times[i], sortedTimes[0]) == 0) {
-        snprintf(times[i], 15, "(%s)", sortedTimes[0]);
+      if (times[i][0] != 'D' && !found &&
+          strcmp(times[i], sortedTimes[0]) == 0) {
+        snprintf(times[i], 20, "(%s)", sortedTimes[0]);
         found = true;
       }
     found = false;
     for (int i = 0; i < x; i++)
-      if (!found && strcmp(times[i], sortedTimes[4]) == 0) {
-        snprintf(times[i], 15, "(%s)", sortedTimes[4]);
+      if (times[i][0] != 'D' && !found &&
+          strcmp(times[i], sortedTimes[4]) == 0) {
+        snprintf(times[i], 20, "(%s)", sortedTimes[4]);
         found = true;
       }
   }
@@ -112,15 +115,26 @@ int timeToMillis(char time[10]) {
          10 * (time[7] - '0') + (time[8] - '0');
 }
 
-void getAverageOf5(char times[5][12], char avg[10]) {
-  for (int i = 0; i < 5; i++)
-    if (times[i][0] == '-')
+void getAverageOf5(char times[5][20], char avg[10]) {
+  int dnfCount = 0;
+  for (int i = 0; i < 5; i++) {
+    if (times[i][0] == 'D')
+      dnfCount++;
+    if (dnfCount > 1) {
+      strcpy(avg, "DNF");
       return;
+    }
+    if (times[i][0] == '-') {
+      avg[0] = '-';
+      avg[1] = '\0';
+      return;
+    }
+  }
 
   char validTimes[3][12];
   int x = 0;
   for (int i = 0; i < 5; i++) {
-    if (times[i][0] == '(')
+    if (times[i][0] == '(' || times[i][0] == 'D')
       continue;
     strcpy(validTimes[x++], times[i]);
   }
@@ -133,4 +147,57 @@ void getAverageOf5(char times[5][12], char avg[10]) {
   int seconds = (millisecondsTotal / 1000) % 60;
   int milliseconds = millisecondsTotal % 1000;
   snprintf(avg, 17, "%02d:%02d.%03d", minutes, seconds, milliseconds);
+}
+
+void setDNF(int index, int cubeSize) {
+  char filename[20];
+  snprintf(filename, 20, "times/%d.time", cubeSize);
+
+  FILE *fp = fopen(filename, "r");
+  int lineNumber = countLines(fp);
+  fclose(fp);
+
+  int targetLine = lineNumber < 5 ? index + 1 : lineNumber - 4 + index;
+
+  char command[64];
+  snprintf(command, 64, "sed -i '%d {/^D/! s/.*/DNF(&)/}' times/%d.time",
+           targetLine, cubeSize);
+
+  system(command);
+}
+void setPlusTwo(int index, int cubeSize) {
+  char filename[20], command[86], path[1024];
+  snprintf(filename, 20, "times/%d.time", cubeSize);
+
+  FILE *fp = fopen(filename, "r");
+  int lineNumber = countLines(fp);
+  fclose(fp);
+
+  int targetLine = lineNumber < 5 ? index + 1 : lineNumber - 4 + index;
+  snprintf(command, sizeof(command), "sed -n '%dp' %s", targetLine, filename);
+
+  fp = popen(command, "r");
+  if (fp == NULL) {
+    printf("Failed to run command\n");
+    exit(1);
+  }
+
+  if (fgets(path, sizeof(path), fp) != NULL) {
+    int time = timeToMillis(path);
+    int minutes = time / (1000 * 60);
+    int seconds = (time / 1000) % 60 + 2;
+    int milliseconds = time % 1000;
+
+    char newTime[20];
+    snprintf(newTime, sizeof(newTime), "%02d:%02d.%03d+", minutes, seconds,
+             milliseconds);
+
+    snprintf(command, sizeof(command), "sed -i '%ds/.*/%s/' %s", targetLine,
+             newTime, filename);
+    system(command);
+  } else {
+    printf("No output from command\n");
+  }
+
+  pclose(fp);
 }
