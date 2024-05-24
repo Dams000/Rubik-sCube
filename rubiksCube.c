@@ -424,7 +424,7 @@ void drawLoadingScreen(int frameCount) {
 }
 
 void *initEverything() {
-  // init();
+  init();
 
   initCameraSettings();
 

@@ -37,3 +37,36 @@ void storeTime(char *time, int size) {
 
   fclose(file);
 }
+
+int timeToSeconds(char time[10]) {
+  return 600 * (time[0] - '0') + 60 * (time[1] - '0') + 10 * (time[3] - '0') +
+         time[4] - '0';
+}
+
+int timeToMillis(char time[10]) {
+  return 1000 * timeToSeconds(time) + 100 * (time[6] - '0') +
+         10 * (time[7] - '0') + (time[8] - '0');
+}
+
+int getMinutesFromMillis(int millis) { return millis / (1000 * 60); }
+
+int getSecondsFromMillis(int millis) { return (millis / 1000) % 60; }
+
+int getMillisFromMillis(int millis) { return millis % 1000; }
+
+int countLines(FILE *fp) {
+  int count = 0;
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
+
+  while ((read = getline(&line, &len, fp)) != -1)
+    count++;
+
+  rewind(fp);
+  return count;
+}
+
+void getFileName(char filename[20], int cubeSize) {
+  snprintf(filename, 20, "times/%d.time", cubeSize);
+}
