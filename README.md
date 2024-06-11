@@ -27,6 +27,10 @@ Sources:
 - Kociemba's algorithm (usually finds a solution in 20-22 moves).
 
 ## Usage
+Because we are using Raylib and RayGui, make sure the following libraries are installed:
+```
+libx11-dev libxrandr-dev libxi-dev libgl1-mesa-dev libglu1-mesa-dev libxcursor-dev libxinerama-dev libwayland-dev libxkbcommon-dev
+```
 Run the following commands to compile and run the project:
 ```bash
 ./build.sh && ./rubiks

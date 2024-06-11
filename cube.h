@@ -3,7 +3,7 @@
 
 #include "cublet.h"
 
-#define SIZE 3
+extern int SIZE;
 
 typedef enum Rotations {
   U,
@@ -33,7 +33,7 @@ typedef enum Rotations {
 } Rotation;
 
 typedef struct Cube {
-  Cubie*** cube;
+  Cubie ***cube;
 } Cube;
 
 Cube Cube_make(float cubletSize);

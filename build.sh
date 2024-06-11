@@ -1,1 +1,1 @@
-gcc -Wall -Wextra -o rubiks kociemba/twoPhase.c kociemba/move.c kociemba/faceCube.c kociemba/enums.c kociemba/cubieCube.c kociemba/coordCube.c cublet.c cube.c timer.c scramble.c rubiksCube.c utils.c -L ./include/ -lraylib -lm -pthread -g -O0 -fsanitize=address
+gcc -Wall -Wextra -o rubiks include/raygui.c kociemba/twoPhase.c kociemba/move.c kociemba/faceCube.c kociemba/enums.c kociemba/cubieCube.c kociemba/coordCube.c average.c cublet.c cube.c timer.c scramble.c rubiksCube.c utils.c -L ./include/ -lraylib -lm -pthread -g -O0 -fsanitize=address
