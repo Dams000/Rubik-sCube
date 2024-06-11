@@ -77,13 +77,11 @@ int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
   // validate cube
   int errorCode = validateCubeStringAndInitCubieCube(cube, &cubieCube);
   if (errorCode != 0)
-    // invalid cube
     return errorCode;
   // validate pattern
   CubieCube patternCubieCube = CubieCube_make();
   errorCode = validateCubeStringAndInitCubieCube(pattern, &patternCubieCube);
   if (errorCode != 0)
-    // invalid pattern
     return abs(errorCode);
   // check if cube is already solved
   if (strcmp(cube, pattern) == 0) {
@@ -95,7 +93,6 @@ int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
   CubieCube cubieCubeToSolve = getInvCubieCube(&patternCubieCube);
   CubieCube_multiply(&cubieCubeToSolve, &cubieCube);
 
-  // initialization
   CoordCube coordCube = CoordCube_make(cubieCubeToSolve);
   axis[0] = 0;
   movePower[0] = 0;
@@ -155,17 +152,14 @@ int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
             double elapsed_time_ms = (double)elapsed_time_ns / 1000000.0;
             // check for timeout
             if (elapsed_time_ms > timeOut) {
-              // timeout, no solution within given time
               return -8;
             }
-
             // we tried all 18 moves, so we need to backtrack or increase search
             // depth if we finished the DFS for current search depth, increase
             // search depth
             if (n == 0) {
               // increase search depth (if possible)
               if (depthPhase1 >= maxDepth)
-                // no solution exists for the given maxDepth
                 return -7;
               else {
                 depthPhase1++;
@@ -240,15 +234,12 @@ int findSolutionBasic(char *cube, int maxDepth, long timeOut,
 }
 
 int validateCubeStringAndInitCubieCube(char *cube, CubieCube *cubieCube) {
-  // validates that there are exactly 9 facelets of each color
   int count[6] = {0};
   for (int i = 0; i < 54; i++) {
     count[getCorrespondingColor(cube[i])]++;
   }
-  // invalid cube, there are not exactly 9 facelets of each color
   for (int i = 0; i < 6; i++) {
     if (count[i] != 9) {
-      // invalid cube, there are not exactly 9 facelets of each color
       return -1;
     }
   }
@@ -258,7 +249,6 @@ int validateCubeStringAndInitCubieCube(char *cube, CubieCube *cubieCube) {
   // verify cubie level
   int errorCode = verify(&cc);
   if (errorCode == 0) {
-    // cube is valid
     // copy cubieCube representation to entered cube
     for (int i = 0; i < 8; i++) {
       cubieCube->cornerPermutation[i] = cc.cornerPermutation[i];
@@ -295,7 +285,6 @@ int totalDepth(int depthPhase1, int maxDepth) {
                  (N_SLICE2 * URFtoDLF[depthPhase1] + FRtoBR[depthPhase1]) * 2 +
                      parity[depthPhase1]);
   if (d1 > maxDepth)
-    // no solution exists for the given maxDepth
     return -1;
   // initialize helping coordinates for all the moves in phase1
   // these coordinates are used for initializing the URtoDF coordinate
@@ -312,7 +301,6 @@ int totalDepth(int depthPhase1, int maxDepth) {
                  (N_SLICE2 * URtoDF[depthPhase1] + FRtoBR[depthPhase1]) * 2 +
                      parity[depthPhase1]);
   if (d2 > maxDepth)
-    // no solution exists for the given maxDepth
     return -1;
 
   if ((minDistPhase2[depthPhase1] = fmax(d1, d2)) == 0) // already solved
@@ -327,14 +315,9 @@ int totalDepth(int depthPhase1, int maxDepth) {
   movePower[depthPhase1] = 0;
   axis[depthPhase1] = 0;
 
-  // run until solution found
+  // similar to the way it was done in phase1
   do {
-    // compute next move (IDA*)
-    // similar to the way it was done in phase1
     do {
-      /*if not all branches that continue from current position are "dead ends",
-        i.e. current position can be solved within (depthPhase1 + depthPhase2 -
-        n) or fewer moves, go deeper*/
       if ((depthPhase1 + depthPhase2 - n > minDistPhase2[n + 1]) && !busy) {
         if (axis[n] == 0 || axis[n] == 3) {
           // if the previous move twisted U or D, start move iteration from R
@@ -347,25 +330,13 @@ int totalDepth(int depthPhase1, int maxDepth) {
           axis[++n] = 0;
           movePower[n] = 1;
         }
-      }
-      // otherwise, try the next branch
-      // increase power and check if we tried all powers
-      // for R, L, F and B we can only use the power of 2 (180 degrees)
-      else if ((axis[n] == 0 || axis[n] == 3)
-                   ? (++movePower[n] > 3)
-                   : ((movePower[n] = movePower[n] + 2) > 3)) {
-        // we tried all possible powers for current axis, so move to the next
-        // axis
+      } else if ((axis[n] == 0 || axis[n] == 3)
+                     ? (++movePower[n] > 3)
+                     : ((movePower[n] = movePower[n] + 2) > 3)) {
         do {
-          // increase axis and check if we tried all axes
           if (++axis[n] > 5) {
-            // we tried all possible moves, so we need to backtrack or increase
-            // search depth if we finished the DFS for current search depth,
-            // increase search depth
             if (n == depthPhase1) {
-              // increase search depth (if possible)
               if (depthPhase2 >= maxDepth)
-                // no solution exists for the given maxDepth
                 return -1;
               else {
                 depthPhase2++;
@@ -374,9 +345,7 @@ int totalDepth(int depthPhase1, int maxDepth) {
                 busy = false;
                 break;
               }
-            }
-            // else, we need to backtrack
-            else {
+            } else {
               n--;
               busy = true;
               break;
@@ -393,12 +362,10 @@ int totalDepth(int depthPhase1, int maxDepth) {
           }
         } while (n != depthPhase1 &&
                  (axis[n - 1] == axis[n] || axis[n - 1] == axis[n] + 3));
-        // we don't want to twist the same faces or the parallel faces move
-        // after move
       } else
-        busy = false; // we found our next move
+        busy = false;
     } while (busy);
-    // compute new coordinates and new minDistPhase2
+
     mv = 3 * axis[n] + movePower[n] - 1;
     URFtoDLF[n + 1] = URFtoDLF_Move[URFtoDLF[n]][mv];
     FRtoBR[n + 1] = FRtoBR_Move[FRtoBR[n]][mv];
@@ -414,6 +381,5 @@ int totalDepth(int depthPhase1, int maxDepth) {
                             parity[n + 1]));
 
   } while (minDistPhase2[n + 1] != 0);
-  // return total maneuver length
   return depthPhase1 + depthPhase2;
 }
