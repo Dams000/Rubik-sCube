@@ -7,6 +7,7 @@
 #include "scramble.h"
 #include "timer.h"
 #include "utils.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,11 +32,11 @@ char **scramble, *currentScramble, currentSolution[76], solutionFoundText[30],
     times[5][20], avg[10];
 int currentSolutionSize;
 
-bool showHelp = false, isEverythingLoaded = false;
+bool showHelp = false, showExitMessageBox = false, isEverythingLoaded = false;
 
 char *enter = "Press 'Enter' to scramble the cube.";
 char *rotateFace =
-    "Press the corresponding key to move each face (Hold alt down for "
+    "Press the corresponding key to move each face (Hold 'alt' down for "
     "prime moves):";
 char *facesKey = "R (right), L (left), U (up), D (down), F (front), B (back).";
 char *solveKey =
@@ -45,7 +46,8 @@ char *mouseRight =
 char *mouseMiddle = "Press middle mouse button to reset camera settings.";
 char *mouseLeft = "Hold left mouse button down to move the camera around.";
 char *spaceBar = "Press the space bar to start (or stop) the timer";
-char *cubeSize = "Press '-' to reduce the cube size and '+' to increase it.";
+char *cubeSize = "Press '-' or 'page down' to reduce the cube size and '+' or "
+                 "'page up' to increase it.";
 
 Timer timer;
 Color timerColor = BLACK;
@@ -233,10 +235,12 @@ void handleKeyPress() {
     timerColor = BLACK;
     if (!timer.isRunning)
       Timer_start(&timer);
-  } else if (IsKeyPressed(KEY_KP_ADD))
+  } else if (IsKeyPressed(KEY_KP_ADD) || IsKeyPressed(KEY_PAGE_UP))
     resizeCube(1);
-  else if (IsKeyPressed(KEY_KP_SUBTRACT))
+  else if (IsKeyPressed(KEY_KP_SUBTRACT) || IsKeyPressed(KEY_PAGE_DOWN))
     resizeCube(-1);
+  else if (IsKeyPressed(KEY_ESCAPE))
+    showExitMessageBox = true;
 }
 
 void handleMouseMovementAndUpdateCamera() {
@@ -445,6 +449,7 @@ int main(int argc, char **argv) {
 
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(1200, 800, "Rubik's Cube");
+  SetExitKey(-1);
   SetWindowMinSize(800, 600);
   SetTargetFPS(40);
 
@@ -483,6 +488,18 @@ int main(int argc, char **argv) {
       drawHelpScreen();
     else
       drawCubeScreen();
+    if (showExitMessageBox) {
+      int result = GuiMessageBox(
+          (Rectangle){(float)GetScreenWidth() / 2 - 200,
+                      (float)GetScreenHeight() / 2 - 75, 400, 150},
+          "#191#Exit", "Do you really want to quit ?", "Yes;No");
+      printf("%d\n", result);
+
+      if (result == 1)
+        break;
+      else if (result == 2)
+        showExitMessageBox = false;
+    }
     EndDrawing();
   }
 
