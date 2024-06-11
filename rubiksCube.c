@@ -138,7 +138,7 @@ void findSolutionAndUpdateCurrentSolution() {
   long long elapsed_time_ns = (now.tv_sec - start.tv_sec) * 1000000000LL +
                               (now.tv_nsec - start.tv_nsec);
   double elapsed_time_ms = (double)elapsed_time_ns / 1000000.0;
-  printf("Solution found in ~%f milliseconds\n", elapsed_time_ms);
+  printf("Solution found in ~%d milliseconds\n", (int)elapsed_time_ms);
 }
 
 void clearCurrentScrambleAndSolution() {
