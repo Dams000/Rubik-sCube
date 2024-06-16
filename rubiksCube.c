@@ -26,7 +26,7 @@ float camera_phi;
 Camera camera = {{0}, {0, 0, 0}, {0, 1, 0}, 90, CAMERA_PERSPECTIVE};
 
 Cube cube;
-char **scramble, *currentScramble, currentSolution[76], solutionFoundText[30],
+char **scramble, *currentScramble, currentSolution[76], solutionFoundText[45],
     times[5][20], avg[10];
 int currentSolutionSize;
 
@@ -55,12 +55,13 @@ bool show = false;
 int timeToShow = -1, posYToShow = 0;
 
 void handleRotation(Rotation clockwise, Rotation antiClockwise) {
-  if (cube.isAnimating) return;
+  if (cube.isAnimating)
+    return;
   cube.isAnimating = true;
   if (IsKeyDown(KEY_LEFT_ALT))
     cube.currentRotation = antiClockwise;
   else
-  cube.currentRotation = clockwise;
+    cube.currentRotation = clockwise;
 }
 
 void applyMovesAndUpdateCurrentScramble() {
@@ -134,12 +135,13 @@ void findSolutionAndUpdateCurrentSolution() {
     return;
   }
 
-  snprintf(solutionFoundText, 30,
-           "Solution found in %d moves:", currentSolutionSize);
-
   long long elapsed_time_ns = (now.tv_sec - start.tv_sec) * 1000000000LL +
                               (now.tv_nsec - start.tv_nsec);
   double elapsed_time_ms = (double)elapsed_time_ns / 1000000.0;
+  snprintf(solutionFoundText, 45,
+           "%d moves solution found in ~%d milliseconds:", currentSolutionSize,
+           (int)elapsed_time_ms);
+
   printf("Solution found in ~%d milliseconds\n", (int)elapsed_time_ms);
 }
 
@@ -429,7 +431,7 @@ void drawLoadingScreen(int frameCount) {
 }
 
 void *initEverything() {
-  // init();
+  init();
 
   initCameraSettings();
 
