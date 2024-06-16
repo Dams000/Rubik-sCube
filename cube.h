@@ -34,6 +34,8 @@ typedef enum Rotations {
 
 typedef struct Cube {
   Cubie ***cube;
+  bool isAnimating;
+  Rotation currentRotation;
 } Cube;
 
 Cube Cube_make(float cubletSize);

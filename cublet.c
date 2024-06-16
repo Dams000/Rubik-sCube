@@ -1,4 +1,5 @@
 #include "cublet.h"
+#include "include/raylib.h"
 #include "include/rlgl.h"
 #include "utils.h"
 
@@ -60,13 +61,19 @@ void Cubie_rotateAntiClockWise(Cubie *cubie) {
   cubie->colors[LEFT] = tmp;
 }
 
-void Cubie_drawCubie(Cubie *cubie, Vector3 position) {
+void Cubie_drawCubie(Cubie *cubie, Vector3 position, Vector3 rotationAxis,
+                     float rotationAngle) {
   float x = 0.0f;
   float y = 0.0f;
   float z = 0.0f;
 
   rlPushMatrix();
-  rlTranslatef(position.x, position.y, position.z);
+  rlTranslatef(rotationAxis.x, rotationAxis.y, rotationAxis.z);
+
+  rlRotatef(rotationAngle, rotationAxis.x, rotationAxis.y, rotationAxis.z);
+
+  rlTranslatef(position.x - rotationAxis.x, position.y - rotationAxis.y,
+               position.z - rotationAxis.z);
 
   rlBegin(RL_TRIANGLES);
 

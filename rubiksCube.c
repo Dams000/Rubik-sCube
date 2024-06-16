@@ -15,8 +15,6 @@
 #define RAYGUI_IMPLEMENTATION
 #include "include/raygui.h"
 
-char textTest[64] = "Some text.";
-
 #define CUBIE_SIZE 0.9
 #define BACKGROUND_COLOR GRAY
 
@@ -57,10 +55,12 @@ bool show = false;
 int timeToShow = -1, posYToShow = 0;
 
 void handleRotation(Rotation clockwise, Rotation antiClockwise) {
+  if (cube.isAnimating) return;
+  cube.isAnimating = true;
   if (IsKeyDown(KEY_LEFT_ALT))
-    Cube_rotate(&cube, antiClockwise, 1);
+    cube.currentRotation = antiClockwise;
   else
-    Cube_rotate(&cube, clockwise, 1);
+  cube.currentRotation = clockwise;
 }
 
 void applyMovesAndUpdateCurrentScramble() {
@@ -241,6 +241,8 @@ void handleKeyPress() {
     resizeCube(-1);
   else if (IsKeyPressed(KEY_ESCAPE))
     showExitMessageBox = true;
+  else if (IsKeyPressed(KEY_Q))
+    cube.isAnimating = true;
 }
 
 void handleMouseMovementAndUpdateCamera() {
@@ -341,9 +343,9 @@ void drawCubeScreen() {
   DrawLine3D(Vector3Zero(), (Vector3){(float)SIZE / 2 + 2, 0, 0}, WHITE);
   DrawLine3D(Vector3Zero(), (Vector3){0, (float)SIZE / 2 + 2, 0}, WHITE);
   DrawLine3D(Vector3Zero(), (Vector3){0, 0, (float)SIZE / 2 + 2}, WHITE);
-  DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
-           SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
-           BLACK);
+  // DrawCube((Vector3){0}, SIZE - (1 - CUBIE_SIZE) - 0.05,
+  //          SIZE - (1 - CUBIE_SIZE) - 0.05, SIZE - (1 - CUBIE_SIZE) - 0.05,
+  //          BLACK);
   Cube_drawCube(&cube);
   EndMode3D();
 
@@ -375,7 +377,6 @@ void drawCubeScreen() {
     if (GuiLabelButton((Rectangle){10, (float)GetScreenHeight() / 2 + posY * 30,
                                    MeasureText(times[i], 20), 20},
                        times[i])) {
-      printf("%d\n", i);
       show = !show;
       timeToShow = i;
       posYToShow = posY;
@@ -428,7 +429,7 @@ void drawLoadingScreen(int frameCount) {
 }
 
 void *initEverything() {
-  init();
+  // init();
 
   initCameraSettings();
 
@@ -493,7 +494,6 @@ int main(int argc, char **argv) {
           (Rectangle){(float)GetScreenWidth() / 2 - 200,
                       (float)GetScreenHeight() / 2 - 75, 400, 150},
           "#191#Exit", "Do you really want to quit ?", "Yes;No");
-      printf("%d\n", result);
 
       if (result == 1)
         break;
