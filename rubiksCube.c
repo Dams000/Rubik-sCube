@@ -4,6 +4,7 @@
 #include "kociemba/coordCube.h"
 #include "kociemba/enums.h"
 #include "kociemba/twoPhase.h"
+#include "queue.h"
 #include "scramble.h"
 #include "timer.h"
 #include "utils.h"
@@ -29,6 +30,7 @@ Cube cube;
 char **scramble, *currentScramble, currentSolution[76], solutionFoundText[45],
     times[5][20], avg[10];
 int currentSolutionSize;
+Queue queue;
 
 bool showHelp = false, showExitMessageBox = false, isEverythingLoaded = false;
 
@@ -55,13 +57,12 @@ bool show = false;
 int timeToShow = -1, posYToShow = 0;
 
 void handleRotation(Rotation clockwise, Rotation antiClockwise) {
-  if (cube.isAnimating)
-    return;
-  cube.isAnimating = true;
   if (IsKeyDown(KEY_LEFT_ALT))
-    cube.currentRotation = antiClockwise;
+    Queue_add(&queue, antiClockwise);
+  // cube.currentRotation = antiClockwise;
   else
-    cube.currentRotation = clockwise;
+    Queue_add(&queue, clockwise);
+  // cube.currentRotation = clockwise;
 }
 
 void applyMovesAndUpdateCurrentScramble() {
@@ -243,6 +244,15 @@ void handleKeyPress() {
     resizeCube(-1);
   else if (IsKeyPressed(KEY_ESCAPE))
     showExitMessageBox = true;
+}
+
+void handleQueue() {
+  if (cube.isAnimating)
+    return;
+  if (Queue_isEmpty(&queue))
+    return;
+  cube.isAnimating = true;
+  cube.currentRotation = Queue_pop(&queue);
 }
 
 void handleMouseMovementAndUpdateCamera() {
@@ -432,6 +442,7 @@ void *initEverything() {
   init();
 
   initCameraSettings();
+  queue = Queue_make();
 
   timer = Timer_make();
   getTimes(times, SIZE);
@@ -482,6 +493,7 @@ int main(int argc, char **argv) {
     if (!showHelp) {
       handleMouseMovementAndUpdateCamera();
       handleKeyPress();
+      handleQueue();
     }
 
     BeginDrawing();
