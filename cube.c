@@ -44,7 +44,7 @@ void Cube_free(Cube cube) {
 
 void handleAnimating(Cube *cube) {
   if (cube->isAnimating)
-    i += 3;
+    i += 5;
   if (i > 90) {
     i = 0;
     cube->isAnimating = false;

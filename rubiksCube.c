@@ -243,8 +243,6 @@ void handleKeyPress() {
     resizeCube(-1);
   else if (IsKeyPressed(KEY_ESCAPE))
     showExitMessageBox = true;
-  else if (IsKeyPressed(KEY_Q))
-    cube.isAnimating = true;
 }
 
 void handleMouseMovementAndUpdateCamera() {
