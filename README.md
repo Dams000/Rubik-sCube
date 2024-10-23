@@ -42,3 +42,9 @@ Run the following commands to compile and run the project:
 ```bash
 ./build.sh && ./rubiks
 ```
+
+or
+
+```bash
+make && ./rubiks
+```
