@@ -25,4 +25,6 @@ Rotation Queue_pop(Queue *queue);
 
 Rotation Queue_peek(Queue *queue);
 
+void Queue_clear(Queue *queue);
+
 #endif // !QUEUE_H

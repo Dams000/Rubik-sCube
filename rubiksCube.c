@@ -8,6 +8,7 @@
 #include "scramble.h"
 #include "timer.h"
 #include "utils.h"
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,10 +60,8 @@ int timeToShow = -1, posYToShow = 0;
 void handleRotation(Rotation clockwise, Rotation antiClockwise) {
   if (IsKeyDown(KEY_LEFT_ALT))
     Queue_add(&queue, antiClockwise);
-  // cube.currentRotation = antiClockwise;
   else
     Queue_add(&queue, clockwise);
-  // cube.currentRotation = clockwise;
 }
 
 void applyMovesAndUpdateCurrentScramble() {
@@ -146,7 +145,10 @@ void findSolutionAndUpdateCurrentSolution() {
   printf("Solution found in ~%d milliseconds\n", (int)elapsed_time_ms);
 }
 
+// TODO: Rename this function
 void clearCurrentScrambleAndSolution() {
+  cube.isAnimating = false;
+  Queue_clear(&queue);
   currentScramble[0] = '\0';
   currentSolution[0] = '\0';
   currentSolutionSize = 0;
@@ -244,6 +246,32 @@ void handleKeyPress() {
     resizeCube(-1);
   else if (IsKeyPressed(KEY_ESCAPE))
     showExitMessageBox = true;
+  else if (IsKeyPressed(KEY_P) && currentSolutionSize > 0) {
+    printf("%d\n", currentSolutionSize);
+    printf("%s\n", currentSolution);
+    if (currentSolution[0] == 'T')
+      return;
+    int i = 0;
+    while (currentSolution[i] != '\0') {
+      if (currentSolution[i] == ' ') {
+        i++;
+        continue;
+      }
+      if (currentSolution[i + 1] == '\'') {
+        Queue_add(&queue,
+                  getCorrespondingRotation(tolower(currentSolution[i])));
+        i += 2;
+      } else if (currentSolution[i + 1] == '2') {
+        Queue_add(&queue, getCorrespondingRotation(currentSolution[i]));
+        Queue_add(&queue, getCorrespondingRotation(currentSolution[i]));
+        i += 2;
+      } else {
+        Queue_add(&queue, getCorrespondingRotation(currentSolution[i]));
+      }
+      i++;
+    }
+    printf("%d\n", i);
+  }
 }
 
 void handleQueue() {
@@ -413,6 +441,10 @@ void drawCubeScreen() {
       show = !show;
     }
   }
+
+  // DrawRectangleRounded((Rectangle){.x = 0, .y = 0, .width = 100, .height =
+  // 100},
+  //                      0.5, 0, RED);
 }
 
 void drawLoadingScreen(int frameCount) {

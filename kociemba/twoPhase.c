@@ -68,6 +68,8 @@ char *printErrorMessage(int error) {
   if (error == 6)
     return "Parity error: Two corners or two edges have to be exchanged in "
            "pattern";
+  if (error == 7)
+    return "Cube is already solved";
   return NULL;
 }
 
@@ -87,7 +89,7 @@ int findSolution(char *cube, int maxDepth, long timeOut, Move moves[maxDepth],
   if (strcmp(cube, pattern) == 0) {
     // cube is already solved, no moves required to solve it
     moves = NULL;
-    return 0;
+    return 7;
   }
   // create new cubieCube to be solved to achieve pattern
   CubieCube cubieCubeToSolve = getInvCubieCube(&patternCubieCube);

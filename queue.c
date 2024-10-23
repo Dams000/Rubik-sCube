@@ -48,3 +48,9 @@ Rotation Queue_peek(Queue *queue) {
   }
   return queue->front->data;
 }
+
+void Queue_clear(Queue *queue) {
+  while (!Queue_isEmpty(queue)) {
+    Queue_pop(queue);
+  }
+}
