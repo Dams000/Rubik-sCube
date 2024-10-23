@@ -1,3 +1,4 @@
 rubiks
 times/*
-!times/
+!times/.gitkeep
+build/*
