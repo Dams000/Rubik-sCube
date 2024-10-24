@@ -36,6 +36,7 @@ typedef struct Cube {
   Cubie ***cube;
   bool isAnimating;
   Rotation currentRotation;
+  int rotationDegrees;
 } Cube;
 
 Cube Cube_make(float cubletSize);

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int SIZE = 3, i = 0;
+int SIZE = 3;
 
 bool isInnerCubie(float x, float y, float z) {
   return x != 0 && y != 0 && z != 0 && x != SIZE - 1 && y != SIZE - 1 &&
@@ -28,7 +28,7 @@ Cube Cube_make(float cubletSize) {
     }
   }
   cube.isAnimating = false;
-  i = 0;
+  cube.rotationDegrees = 0;
   return cube;
 }
 
@@ -44,12 +44,73 @@ void Cube_free(Cube cube) {
 
 void handleAnimating(Cube *cube) {
   if (cube->isAnimating)
-    i += 5;
-  if (i > 90) {
-    i = 0;
+    cube->rotationDegrees += 5;
+  if (cube->rotationDegrees > 90) {
+    cube->rotationDegrees = 0;
     cube->isAnimating = false;
     Cube_rotate(cube, cube->currentRotation, 1);
     cube->currentRotation = -1;
+  }
+}
+
+Vector3 getRotationVector(Rotation rotation, int posX, int posY, int posZ) {
+  switch (rotation) {
+  case X:
+    return (Vector3){-1, 0, 0};
+  case x:
+    return (Vector3){1, 0, 0};
+  case Y:
+    return (Vector3){0, -1, 0};
+  case y:
+    return (Vector3){0, 1, 0};
+  case Z:
+    return (Vector3){0, 0, -1};
+  case z:
+    return (Vector3){0, 0, 1};
+  case U:
+    return (posY == SIZE - 1) ? (Vector3){0, -1, 0} : (Vector3){0, 0, 0};
+  case u:
+    return (posY == SIZE - 1) ? (Vector3){0, 1, 0} : (Vector3){0, 0, 0};
+  case D:
+    return (posY == 0) ? (Vector3){0, 1, 0} : (Vector3){0, 0, 0};
+  case d:
+    return (posY == 0) ? (Vector3){0, -1, 0} : (Vector3){0, 0, 0};
+  case E:
+    return (0 < posY && posY < SIZE - 1) ? (Vector3){0, 1, 0}
+                                         : (Vector3){0, 0, 0};
+  case e:
+    return (0 < posY && posY < SIZE - 1) ? (Vector3){0, -1, 0}
+                                         : (Vector3){0, 0, 0};
+  case R:
+    return (posX == SIZE - 1) ? (Vector3){-1, 0, 0} : (Vector3){0, 0, 0};
+  case r:
+    return (posX == SIZE - 1) ? (Vector3){1, 0, 0} : (Vector3){0, 0, 0};
+  case L:
+    return (posX == 0) ? (Vector3){1, 0, 0} : (Vector3){0, 0, 0};
+  case l:
+    return (posX == 0) ? (Vector3){-1, 0, 0} : (Vector3){0, 0, 0};
+  case M:
+    return (0 < posX && posX < SIZE - 1) ? (Vector3){1, 0, 0}
+                                         : (Vector3){0, 0, 0};
+  case m:
+    return (0 < posX && posX < SIZE - 1) ? (Vector3){-1, 0, 0}
+                                         : (Vector3){0, 0, 0};
+  case F:
+    return (posZ == SIZE - 1) ? (Vector3){0, 0, -1} : (Vector3){0, 0, 0};
+  case f:
+    return (posZ == SIZE - 1) ? (Vector3){0, 0, 1} : (Vector3){0, 0, 0};
+  case B:
+    return (posZ == 0) ? (Vector3){0, 0, 1} : (Vector3){0, 0, 0};
+  case b:
+    return (posZ == 0) ? (Vector3){0, 0, -1} : (Vector3){0, 0, 0};
+  case S:
+    return (0 < posZ && posZ < SIZE - 1) ? (Vector3){0, 0, -1}
+                                         : (Vector3){0, 0, 0};
+  case s:
+    return (0 < posZ && posZ < SIZE - 1) ? (Vector3){0, 0, 1}
+                                         : (Vector3){0, 0, 0};
+  default:
+    return (Vector3){0, 0, 0};
   }
 }
 
@@ -57,80 +118,15 @@ void handleAnimation(Cube *cube, int posX, int posY, int posZ) {
   Vector3 position =
       (Vector3){posX - (float)SIZE / 2 + 0.5f, posY - (float)SIZE / 2 + 0.5f,
                 posZ - (float)SIZE / 2 + 0.5f};
-  if (cube->currentRotation == X)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){-1, 0, 0}, i);
-  else if (cube->currentRotation == x)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){1, 0, 0},
-                    i);
-  else if (cube->currentRotation == Y)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, -1, 0}, i);
-  else if (cube->currentRotation == y)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 1, 0},
-                    i);
-  else if (cube->currentRotation == Z)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, 0, -1}, i);
-  else if (cube->currentRotation == z)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 0, 1},
-                    i);
-  else if (posY == SIZE - 1 && cube->currentRotation == U)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, -1, 0}, i);
-  else if (posY == SIZE - 1 && cube->currentRotation == u)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 1, 0},
-                    i);
-  else if (posY == 0 && cube->currentRotation == D)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 1, 0},
-                    i);
-  else if (posY == 0 && cube->currentRotation == d)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, -1, 0}, i);
-  else if (0 < posY && posY < SIZE - 1 && cube->currentRotation == E)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 1, 0},
-                    i);
-  else if (0 < posY && posY < SIZE - 1 && cube->currentRotation == e)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, -1, 0}, i);
-  else if (posX == SIZE - 1 && cube->currentRotation == R)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){-1, 0, 0}, i);
-  else if (posX == SIZE - 1 && cube->currentRotation == r)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){1, 0, 0},
-                    i);
-  else if (posX == 0 && cube->currentRotation == L)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){1, 0, 0},
-                    i);
-  else if (posX == 0 && cube->currentRotation == l)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){-1, 0, 0}, i);
-  else if (0 < posX && posX < SIZE - 1 && cube->currentRotation == M)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){1, 0, 0},
-                    i);
-  else if (0 < posX && posX < SIZE - 1 && cube->currentRotation == m)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){-1, 0, 0}, i);
-  else if (posZ == SIZE - 1 && cube->currentRotation == F)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, 0, -1}, i);
-  else if (posZ == SIZE - 1 && cube->currentRotation == f)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 0, 1},
-                    i);
-  else if (posZ == 0 && cube->currentRotation == B)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 0, 1},
-                    i);
-  else if (posZ == 0 && cube->currentRotation == b)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, 0, -1}, i);
-  else if (0 < posZ && posZ < SIZE - 1 && cube->currentRotation == S)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position,
-                    (Vector3){0, 0, -1}, i);
-  else if (0 < posZ && posZ < SIZE - 1 && cube->currentRotation == s)
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0, 0, 1},
-                    i);
-  else
-    Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, (Vector3){0}, 0);
+
+  Vector3 direction =
+      getRotationVector(cube->currentRotation, posX, posY, posZ);
+  int rotationDegrees =
+      (direction.x == 0 && direction.y == 0 && direction.z == 0)
+          ? 0
+          : cube->rotationDegrees;
+  Cubie_drawCubie(&cube->cube[posX][posY][posZ], position, direction,
+                  rotationDegrees);
 }
 
 void Cube_drawCube(Cube *cube) {

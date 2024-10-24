@@ -26,7 +26,8 @@ void Cubie_rotateClockWise(Cubie *cubie);
 
 void Cubie_rotateAntiClockWise(Cubie *cubie);
 
-void Cubie_drawCubie(Cubie *cubie, Vector3 position, Vector3 rotationAxis, float rotationAngle);
+void Cubie_drawCubie(Cubie *cubie, Vector3 position, Vector3 rotationAxis,
+                     float rotationAngle);
 
 char Cubie_getColor(Cubie *cubie, Face face);
 
