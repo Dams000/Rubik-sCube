@@ -145,17 +145,20 @@ void findSolutionAndUpdateCurrentSolution() {
   printf("Solution found in ~%d milliseconds\n", (int)elapsed_time_ms);
 }
 
-// TODO: Rename this function
 void clearCurrentScrambleAndSolution() {
-  cube.isAnimating = false;
-  Queue_clear(&queue);
   currentScramble[0] = '\0';
   currentSolution[0] = '\0';
   currentSolutionSize = 0;
 }
 
+void resetAnimationAndSolution() {
+  cube.isAnimating = false;
+  Queue_clear(&queue);
+}
+
 void generateNewScramble() {
   clearCurrentScrambleAndSolution();
+  resetAnimationAndSolution();
   Cube_free(cube);
   cube = Cube_make(CUBIE_SIZE);
   generateScramble(scramble, SIZE);
@@ -174,6 +177,7 @@ void initCurrentScrambleAndSolution() {
   scramble = malloc(SCRAMBLE_SIZE * sizeof(char *));
   currentScramble = malloc((6 * SCRAMBLE_SIZE + 1) * sizeof(char));
   clearCurrentScrambleAndSolution();
+  resetAnimationAndSolution();
   avg[0] = '\0';
 }
 
@@ -191,6 +195,34 @@ void resizeCube(int increment) {
   initCameraSettings();
 
   getTimes(times, SIZE);
+}
+
+// TODO: Make this function more readable (change if)
+// TODO: Disable timer when applying solution
+void applyCurrentSolution() {
+  Timer_disable(&timer);
+  currentSolutionSize = 0;
+  int i = 0;
+  char rotation;
+  while (currentSolution[i] != '\0') {
+    char currMove = currentSolution[i], nextMove = currentSolution[i + 1];
+    if (currMove == ' ') {
+      i++;
+      continue;
+    }
+    if (nextMove == '\'') {
+      rotation = tolower(currMove);
+      i++;
+    } else if (nextMove == '2') {
+      Queue_add(&queue, getCorrespondingRotation(currMove));
+      rotation = currMove;
+      i++;
+    } else {
+      rotation = currMove;
+    }
+    Queue_add(&queue, getCorrespondingRotation(rotation));
+    i++;
+  }
 }
 
 void handleKeyPress() {
@@ -246,32 +278,6 @@ void handleKeyPress() {
     resizeCube(-1);
   else if (IsKeyPressed(KEY_ESCAPE))
     showExitMessageBox = true;
-  else if (IsKeyPressed(KEY_P) && currentSolutionSize > 0) {
-    printf("%d\n", currentSolutionSize);
-    printf("%s\n", currentSolution);
-    if (currentSolution[0] == 'T')
-      return;
-    int i = 0;
-    while (currentSolution[i] != '\0') {
-      if (currentSolution[i] == ' ') {
-        i++;
-        continue;
-      }
-      if (currentSolution[i + 1] == '\'') {
-        Queue_add(&queue,
-                  getCorrespondingRotation(tolower(currentSolution[i])));
-        i += 2;
-      } else if (currentSolution[i + 1] == '2') {
-        Queue_add(&queue, getCorrespondingRotation(currentSolution[i]));
-        Queue_add(&queue, getCorrespondingRotation(currentSolution[i]));
-        i += 2;
-      } else {
-        Queue_add(&queue, getCorrespondingRotation(currentSolution[i]));
-      }
-      i++;
-    }
-    printf("%d\n", i);
-  }
 }
 
 void handleQueue() {
@@ -288,6 +294,7 @@ void handleMouseMovementAndUpdateCamera() {
     Cube_free(cube);
     cube = Cube_make(CUBIE_SIZE);
     clearCurrentScrambleAndSolution();
+    resetAnimationAndSolution();
   } else if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
     initCameraSettings();
   }
@@ -442,9 +449,28 @@ void drawCubeScreen() {
     }
   }
 
-  // DrawRectangleRounded((Rectangle){.x = 0, .y = 0, .width = 100, .height =
-  // 100},
-  //                      0.5, 0, RED);
+  if (currentSolutionSize > 0) {
+    int recW = 100, recH = 30;
+    Rectangle rec = (Rectangle){.x = GetScreenWidth() - 2 * recW,
+                                .y = GetScreenHeight() - 100,
+                                .width = recW,
+                                .height = recH};
+    if (CheckCollisionPointRec(GetMousePosition(), rec)) {
+      SetMouseCursor(MOUSE_CURSOR_POINTING_HAND);
+      DrawRectangleRounded(rec, 0.5, 0, ColorBrightness(DARKGRAY, -.1f));
+      if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+        applyCurrentSolution();
+        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+      }
+    } else {
+      SetMouseCursor(MOUSE_CURSOR_DEFAULT);
+      DrawRectangleRounded(rec, 0.5, 0, ColorBrightness(DARKGRAY, .1f));
+    }
+    float fontSize = 20;
+    float textWidth = MeasureText("Apply", fontSize);
+    DrawText("Apply", rec.x + rec.width / 2 - textWidth / 2,
+             rec.y + rec.height / 2 - fontSize / 2, fontSize, BLACK);
+  }
 }
 
 void drawLoadingScreen(int frameCount) {
