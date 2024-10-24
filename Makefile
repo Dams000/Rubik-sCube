@@ -27,13 +27,16 @@ OBJ = $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 all: $(OUTPUT)
 
 $(OUTPUT): $(OBJ)
+	@echo "===== Linking $@... ====="
 	$(CC) $(OBJ) $(LIBS) -o $(OUTPUT)
 
 $(OBJDIR)/%.o: %.c
+	@echo "===== Compiling $<... ====="
 	@mkdir -p $(dir $@) 
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
+	@echo "Cleaning up..."
 	rm -rf $(OBJDIR) $(OUTPUT)
 
 .PHONY: all clean
